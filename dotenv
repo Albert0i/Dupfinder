@@ -1,0 +1,6 @@
+
+# SQLite DB path
+DB_PATH='./data/db.sq3'
+
+# Batch size for inserts and updates
+BATCH_SIZE=1000

@@ -1,5 +1,5 @@
 
-## 🧵 Multi-Threaded `processFolder.js`: A Ritual of Concurrency
+## 🧵 Multi-Threaded `processFolder.concurrent.js`: A Ritual of Concurrency
 
 This version simulates parallelism using **async workers**, not true threads. It orchestrates multiple file-processing tasks at once, while preserving order and symbolic integrity.
 
