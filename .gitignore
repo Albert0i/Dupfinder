@@ -14,4 +14,4 @@ node_modules
 **/*.gguf
 /src/generated/prisma
 
-./data
+/data/
