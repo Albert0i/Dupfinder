@@ -56,6 +56,7 @@ async function flushBatch(db, insertStmt, updateStmt) {
           item.fileFormat,
           item.fileSize,
           item.hash,
+          item.indexedAt,      
           item.createdAt,
           item.modifiedAt
         );
@@ -79,12 +80,15 @@ async function flushBatch(db, insertStmt, updateStmt) {
 
 // 🧬 Process individual file and add to batch
 async function processFile(filePath, db, insertStmt, updateStmt) {
+  const now = new Date();
+
   try {
     const stat = await fs.stat(filePath);
     const hash = await hashFile(filePath);
     const fileName = path.basename(filePath);
     const fileFormat = path.extname(filePath).slice(1).toLowerCase();
     const fileSize = stat.size;
+    const indexedAt = now.toISOString();
     const createdAt = stat.birthtime.toISOString();
     const modifiedAt = stat.mtime.toISOString();
 
@@ -94,6 +98,7 @@ async function processFile(filePath, db, insertStmt, updateStmt) {
       fileFormat,
       fileSize,
       hash,
+      indexedAt,
       createdAt,
       modifiedAt
     });

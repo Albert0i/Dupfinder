@@ -104,6 +104,7 @@ export const SQL_create_table = `
       fileFormat VARCHAR(16) NOT NULL,
       fileSize INTEGER NOT NULL,
       hash CHAR(64) NOT NULL,
+      indexedAt VARCHAR(24) NOT NULL,
       createdAt VARCHAR(24) NOT NULL,
       modifiedAt VARCHAR(24) NOT NULL,
       updateIdent INTEGER NOT NULL DEFAULT 0,

@@ -1,0 +1,22 @@
+<div class="max-w-3xl mx-auto mt-10 p-6 bg-white shadow rounded">
+    <h1 class="text-2xl font-bold mb-4">Duplicate Hashes</h1>
+  
+    <% if (hash) { %>
+      <h2 class="text-lg font-semibold mb-2">Files with hash: <code><%= hash %></code></h2>
+      <ul class="list-disc pl-6 text-gray-700">
+        <% duplicates.forEach(file => { %>
+          <li><%= file.path %> — <%= file.createdAt %></li>
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <ul class="list-disc pl-6 text-gray-700">
+        <% duplicates.forEach(row => { %>
+          <li>
+            <a href="/duplicates/<%= row.hash %>" class="text-blue-600 hover:underline">
+              <%= row.hash %>
+            </a> — <%= row.count %> copies
+          </li>
+        <% }) %>
+      </ul>
+    <% } %>
+  </div>

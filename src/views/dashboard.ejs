@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dupfinder Dashboard</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <script src="/assets/tailwind.js"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+  <a href="/duplicates" class="block max-w-3xl mx-auto mt-12 p-6 bg-white shadow-lg rounded-lg hover:shadow-xl transition cursor-pointer">
+    <h1 class="text-3xl font-bold mb-4 text-center">🌀 Dupfinder Dashboard</h1>
+
+    <p class="mb-6 text-center text-gray-600">
+      Run <code class="bg-gray-100 px-2 py-1 rounded text-sm">node processFolder.js</code> and reload to update.
+    </p>
+
+    <div class="grid grid-cols-2 gap-6 text-center">
+      <div class="bg-blue-50 p-4 rounded-lg shadow">
+        <h2 class="text-xl font-semibold mb-2">Files Scanned</h2>
+        <p class="text-4xl font-bold text-blue-700"><%= totalFiles %></p>
+      </div>
+      <div class="bg-red-50 p-4 rounded-lg shadow">
+        <h2 class="text-xl font-semibold mb-2">Duplicate Hashes</h2>
+        <p class="text-4xl font-bold text-red-700"><%= duplicateCount %></p>
+      </div>
+    </div>
+
+    <% if (lastScanTime) { %>
+      <p class="mt-6 text-sm text-gray-500 text-center">
+        Last scanned: <%= lastScanTime %>
+      </p>
+    <% } %>
+  </a>
+
+</body>
+</html>
