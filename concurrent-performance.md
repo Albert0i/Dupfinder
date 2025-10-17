@@ -1,5 +1,4 @@
-
-## 🪶 Dupfinder Benchmark
+## 🧵 Multi-Threaded `processFolder.concurrent.js`: Benchmark
 
 ### 📜 Ritual Summary
 
