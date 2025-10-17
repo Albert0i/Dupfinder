@@ -1,5 +1,5 @@
 
-## 🪶 Veiltrace Benchmark Scroll (Finalized)
+## 🪶 Dupfinder Benchmark
 
 ### 📜 Ritual Summary
 
