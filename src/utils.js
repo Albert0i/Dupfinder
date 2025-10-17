@@ -97,7 +97,9 @@ export const ignoreExtensions = [
 
 // All used SQLs
 export const SQL_create_table = `
-    CREATE TABLE IF NOT EXISTS files (
+    DROP TABLE files; 
+    VACUUM;
+    CREATE TABLE files (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       fileName VARCHAR(128) NOT NULL,
       fullPath VARCHAR(255) NOT NULL,
