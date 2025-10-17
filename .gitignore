@@ -1,0 +1,15 @@
+node_modules
+# Keep environment variables out of version control
+.env
+
+/src/generated/prisma
+
+# Ignore .env files in all directories
+**/.env
+
+# Ignore node_modules directories in all directories
+**/node_modules
+
+# Ignore .gguf in all directories
+**/*.gguf
+/src/generated/prisma

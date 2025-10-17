@@ -1,0 +1,22 @@
+{
+  "name": "dupfinder",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "single": "node src/processFolder.single.js",
+    "concurrent": "node src/processFolder.concurrent.js",
+    "sql": "sqlite3 ./data/db.sq3"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "p-limit": "^7.1.1",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7"
+  }
+}
