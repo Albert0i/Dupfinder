@@ -13,3 +13,5 @@ node_modules
 # Ignore .gguf in all directories
 **/*.gguf
 /src/generated/prisma
+
+./data
