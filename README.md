@@ -3,7 +3,7 @@
 
 ### 📜 Ritual Summary
 
-- **Scanner**: `processFolder.js`
+- **Scanner**: `processFolder.concurrent.js`
 - **Audit Discipline**: SQLite with UNIQUE(fullPath), serialized flushes
 - **Machine**: 32 GB RAM, SSD, multi-core CPU
 - **Dataset**: ~60,760–60,764 files
