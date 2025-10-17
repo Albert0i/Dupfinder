@@ -56,7 +56,7 @@ async function flushBatch(db, insertStmt, updateStmt) {
           item.fileFormat,
           item.fileSize,
           item.hash,
-          item.indexedAt,      
+          item.indexedAt, 
           item.createdAt,
           item.modifiedAt
         );
@@ -98,7 +98,7 @@ async function processFile(filePath, db, insertStmt, updateStmt) {
       fileFormat,
       fileSize,
       hash,
-      indexedAt,
+      indexedAt, 
       createdAt,
       modifiedAt
     });

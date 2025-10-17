@@ -113,8 +113,8 @@ export const SQL_create_table = `
   `;
 
 export const SQL_insert = `
-    INSERT INTO files (fileName, fullPath, fileFormat, fileSize, hash, createdAt, modifiedAt)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO files (fileName, fullPath, fileFormat, fileSize, hash, indexedAt, createdAt, modifiedAt)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
 export const SQL_update = `
