@@ -6,7 +6,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
-import { hashFile, walk, SQL_create_table, SQL_insert, SQL_update } from './utils.js'
+import { hashFile, walk, SQL_create_table, SQL_insert, SQL_update, writeAudit } from './utils.js'
 
 const DB_PATH = process.env.DB_PATH || './data/db.sq3';
 const BATCH_SIZE = process.env.BATCH_SIZE || 1000;
@@ -52,58 +52,6 @@ const ROOT_FOLDER = args[0] || 'D:\\';
 
 // 📣 Show which folder will be scanned
 console.log(`📂 Scanning folder: ${ROOT_FOLDER}`);
-
-// 🧭 Recursively walk through folder and yield file paths
-// async function* walk(dir) {
-//   try {
-//     const dirHandle = await fs.opendir(dir);
-
-//     for await (const entry of dirHandle) {
-//       const fullPath = path.join(dir, entry.name);
-
-//       if (ignoreList.includes(entry.name)) {
-//         console.log(`🛡️ Ignored: ${fullPath}`);
-//         continue;
-//       }
-
-//       if (await isHidden(fullPath)) {
-//         console.log(`🛡️ Ignored hidden: ${fullPath}`);
-//         continue
-//       };
-
-//       try {
-//         const stat = await fs.lstat(fullPath);
-
-//         if (stat.isDirectory()) {
-//           yield* walk(fullPath);
-//         } else if (stat.isFile()) {
-//           const ext = path.extname(entry.name).toLowerCase();
-          
-//           if (ignoreExtensions.includes(ext)) {
-//             console.log(`🛡️ Ignored extension: ${fullPath}`);
-//             continue;
-//           }
-
-//           if (stat.size === 0) {
-//             console.log(`🛡️ Ignored empty file: ${fullPath}`);
-//             continue;
-//           }
-
-//           yield fullPath;
-//         }
-//       } catch (err) {
-//         console.error(`⚠️ Error accessing ${fullPath}:`, err.message);
-//         continue;
-//       }
-//     }
-//   } catch (err) {
-//     if (err.code === 'EPERM' || err.code === 'EACCES') {
-//       console.warn(`🚫 Skipped protected folder: ${dir}`);
-//     } else {
-//       console.error(`⚠️ Error accessing ${dir}:`, err.message);
-//     }
-//   }
-// }
 
 // 🧾 Flush batch into database, handle constraint violations
 async function flushBatch(db, insertStmt, updateStmt) {
@@ -215,6 +163,11 @@ async function main() {
   // 🧾 Prepare update statement 
   const updateStmt = await db.prepare(SQL_update);
 
+  // Write audit
+  await writeAudit(db, 'scanFolder', ROOT_FOLDER);
+  const startTime = new Date(); // ✅ creates a Date object
+  await writeAudit(db, 'startTime', startTime.toISOString());
+
   // Start running here... 
   for await (const filePath of walk(ROOT_FOLDER)) {
     queue.push(filePath);
@@ -233,19 +186,31 @@ async function main() {
   await flushBatch(db, insertStmt, updateStmt);
   await insertStmt.finalize();    // 🔒 Finalize insert statement
   await updateStmt.finalize();    // 🔒 Finalize update statement
+
+  // Write audit
+  const endTime = new Date(); // ✅ creates a Date object
+  const elapsed = ((endTime - startTime) / 1000).toFixed(2);
+  
+  await writeAudit(db, 'endTime', endTime.toISOString());
+  await writeAudit(db, 'elapsedTime', elapsed);
+  await writeAudit(db, 'enqueuedTotal', enqueuedCount);
+  await writeAudit(db, 'filesProcessed', processedCount);
+  await writeAudit(db, 'difference', enqueuedCount - processedCount);
+  await writeAudit(db, 'filesSkipped',  skippedCount);
+  // Find paths that were enqueued but not processed
+  const missing = [...enqueuedPaths].filter(p => !processedPaths.has(p));
+  await writeAudit(db, 'missingFiles',  missing.length);
+
   await db.close();               // 🔚 Close database connection
 
   // Write all enqueued paths
   await fs.writeFile('./data/enqueued.txt', [...enqueuedPaths].join('\n'));
   // Write all processed paths
   await fs.writeFile('./data/processed.txt', [...processedPaths].join('\n'));
-  // Find paths that were enqueued but not processed
-  const missing = [...enqueuedPaths].filter(p => !processedPaths.has(p));
   // Write missing paths to file
   await fs.writeFile('./data/missing.txt', missing.join('\n'));
 
   // 🧮 Final report
-  const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
   console.log(`\n✅ Scan complete.`);
   console.log(`⏱️ Elapsed time: ${elapsed} seconds`);
   console.log(`📦 Enqueued total: ${enqueuedCount}`);

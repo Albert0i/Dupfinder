@@ -14,7 +14,6 @@ const BATCH_SIZE = process.env.BATCH_SIZE || 1000;
 let batch = [];                     // Pending records
 let processedCount = 0;             // Files processed
 let skippedCount = 0;               // Files skipped
-//const startTime = Date.now();       // Scan start time
 
 // 🧭 Get folder path from command-line argument
 const args = process.argv.slice(2);
@@ -126,6 +125,7 @@ async function main() {
   const updateStmt = await db.prepare(SQL_update);
 
   // Write audit
+  await writeAudit(db, 'scanFolder', ROOT_FOLDER);
   const startTime = new Date(); // ✅ creates a Date object
   await writeAudit(db, 'startTime', startTime.toISOString());
 
@@ -162,7 +162,6 @@ async function main() {
   await db.close();               // 🔚 Close database connection
   
   // 🧮 Final report
-  //const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
   console.log(`\n✅ Scan complete.`);
   console.log(`⏱️ Elapsed time: ${elapsed} seconds`);
   console.log(`📁 Files processed: ${processedCount}`);
