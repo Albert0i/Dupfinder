@@ -165,6 +165,8 @@ async function main() {
 
   // Write audit
   await writeAudit(db, 'scanFolder', ROOT_FOLDER);
+  await writeAudit(db, 'mode', 'single');
+  
   const startTime = new Date(); // ✅ creates a Date object
   await writeAudit(db, 'startTime', startTime.toISOString());
 

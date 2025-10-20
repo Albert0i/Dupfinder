@@ -17,12 +17,20 @@ router.get('/', async (req, res) => {
         SELECT hash FROM files GROUP BY hash HAVING COUNT(*) > 1
       )
     `);
+    const scanFolder = await dbGet(`
+      SELECT auditValue
+        FROM audit 
+        WHERE auditKey='scanFolder'`)
+    const scanAt = await dbGet(`
+      SELECT auditValue
+      FROM audit 
+      WHERE auditKey='endTime'`)
 
     res.render('dashboard', {
       totalFiles: totalRow?.totalFiles || 0,
       duplicateCount: dupRow?.duplicateCount || 0,
-      lastScanFolder: "d:\\", 
-      lastScanAt: "2025-01-13T09:09:47.983Z" 
+      scanFolder: scanFolder?.auditValue || null, 
+      scanAt: scanAt?.auditValue || null
     });
   } catch (err) {
     console.error('Database error:', err);

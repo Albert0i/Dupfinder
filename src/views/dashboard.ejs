@@ -36,12 +36,25 @@
         </div>
       </div>
 
+    </main>
+
+    <section class="flex-grow flex flex-col justify-center cursor-pointer" >
       <div class="mt-6 text-center text-lg text-black">
-        <p>Last scanned folder: <code class="bg-gray-100 px-2 py-1 rounded"><%= lastScanFolder %></code></p>
-        <p class="mt-1">Last scanned at: <%= lastScanAt %></p>
-      </div>
-    </main>
-    </main>
+        <p class="mt-1">
+          Scanned folder: <code class="bg-gray-100 px-2 py-1 rounded">
+            <%= (scanFolder ? scanFolder: '---') %>
+          </code>
+        </p>
+        <p class="mt-1">
+          Scanned at: <%= (scanAt ? scanAt: '---') %>
+        </p>
+
+        <input type="checkbox" id="autoReloadToggle" />
+        <label for="autoReloadToggle" class="text-sm text-gray-700">
+          Auto reload every 5 seconds
+        </label>
+      </div>      
+    </section>
 
     <!-- Copilot Credit -->
     <footer class="m-4 text-center text-sm text-gray-700">
@@ -54,6 +67,55 @@
     </footer>
 
   </section>
+
+  <script type="text/javascript">
+    const toggle = document.getElementById('autoReloadToggle');
+    let reloadInterval = null;
+  
+    // Value passed from server
+    const scanAt = <%- JSON.stringify(scanAt) %>;
+  
+    // Restore saved state
+    const saved = localStorage.getItem('autoReloadEnabled');
+    if (saved === 'true') {
+      toggle.checked = true;
+      startReload();
+    }
+  
+    // Listen for changes
+    toggle.addEventListener('change', () => {
+      const enabled = toggle.checked;
+      localStorage.setItem('autoReloadEnabled', enabled);
+      if (enabled) {
+        startReload();
+      } else {
+        stopReload();
+      }
+    });
+  
+    function startReload() {
+      stopReload(); // clear any existing interval
+      reloadInterval = setInterval(() => {
+        // If scanAt is now defined, stop reloading
+        if (scanAt !== null && scanAt !== undefined && scanAt !== '') {
+          toggle.checked = false;
+          localStorage.setItem('autoReloadEnabled', false);
+          stopReload();
+          console.log('🧘 Scan complete — auto reload disabled.');
+        } else {
+          window.location.reload();
+        }
+      }, 5000);
+    }
+  
+    function stopReload() {
+      if (reloadInterval) {
+        clearInterval(reloadInterval);
+        reloadInterval = null;
+        localStorage.removeItem('autoReloadEnabled');
+      }
+    }
+  </script>
 
 </body>
 </html>
