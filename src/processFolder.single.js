@@ -6,7 +6,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
-import { hashFile, walk, SQL_create_table, SQL_insert, SQL_update } from './utils.js'
+import { hashFile, walk, SQL_create_table, SQL_insert, SQL_update, writeAudit } from './utils.js'
 
 const DB_PATH = process.env.DB_PATH || './data/db.sq3';
 const BATCH_SIZE = process.env.BATCH_SIZE || 1000;
@@ -14,7 +14,7 @@ const BATCH_SIZE = process.env.BATCH_SIZE || 1000;
 let batch = [];                     // Pending records
 let processedCount = 0;             // Files processed
 let skippedCount = 0;               // Files skipped
-const startTime = Date.now();       // Scan start time
+//const startTime = Date.now();       // Scan start time
 
 // 🧭 Get folder path from command-line argument
 const args = process.argv.slice(2);
@@ -118,12 +118,16 @@ async function main() {
 
   // 🧾 Create table if not exists
   await db.exec(SQL_create_table);
-
+  
   // 🧾 Prepare insert statement 
   const insertStmt = await db.prepare(SQL_insert);
 
   // 🧾 Prepare update statement 
   const updateStmt = await db.prepare(SQL_update);
+
+  // Write audit
+  const startTime = new Date(); // ✅ creates a Date object
+  await writeAudit(db, 'startTime', startTime.toISOString());
 
   // Start running here... 
   for await (const filePath of walk(ROOT_FOLDER)) {
@@ -145,15 +149,25 @@ async function main() {
   await flushBatch(db, insertStmt, updateStmt);   
   await insertStmt.finalize();    // 🔒 Finalize insert statement
   await updateStmt.finalize();    // 🔒 Finalize update statement
+
+  // Write audit
+  const endTime = new Date(); // ✅ creates a Date object
+  const elapsed = ((endTime - startTime) / 1000).toFixed(2);
+  
+  await writeAudit(db, 'endTime', endTime.toISOString());
+  await writeAudit(db, 'elapsedTime', elapsed);
+  await writeAudit(db, 'filesProcessed', processedCount);
+  await writeAudit(db, 'filesSkipped',  skippedCount);
+
   await db.close();               // 🔚 Close database connection
   
   // 🧮 Final report
-  const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+  //const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
   console.log(`\n✅ Scan complete.`);
   console.log(`⏱️ Elapsed time: ${elapsed} seconds`);
   console.log(`📁 Files processed: ${processedCount}`);
   console.log(`⚠️ Files skipped (constraint violation): ${skippedCount}`);
-  
+
   process.exit(0);  // ✅ Exit script successfully
 }
 

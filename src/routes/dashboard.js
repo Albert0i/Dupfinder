@@ -21,7 +21,8 @@ router.get('/', async (req, res) => {
     res.render('dashboard', {
       totalFiles: totalRow?.totalFiles || 0,
       duplicateCount: dupRow?.duplicateCount || 0,
-      lastScanTime: null // Optional: add timestamp logic later
+      lastScanFolder: "d:\\", 
+      lastScanAt: "2025-01-13T09:09:47.983Z" 
     });
   } catch (err) {
     console.error('Database error:', err);

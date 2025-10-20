@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import fsSync from 'fs';
 import path from 'path';
 import crypto from 'crypto';
+import { promisify } from 'util';
 
 // 🔍 Check if file is hidden (starts with . or $)
 export async function isHidden(filePath) {
@@ -97,9 +98,7 @@ export const ignoreExtensions = [
 
 // All used SQLs
 export const SQL_create_table = `
-    DROP TABLE files; 
-    VACUUM;
-    CREATE TABLE files (
+    CREATE TABLE IF NOT EXISTS files (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       fileName VARCHAR(128) NOT NULL,
       fullPath VARCHAR(255) NOT NULL,
@@ -112,6 +111,18 @@ export const SQL_create_table = `
       updateIdent INTEGER NOT NULL DEFAULT 0,
       UNIQUE(fullPath)
     );
+    CREATE TABLE IF NOT EXISTS audit (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      auditKey   VARCHAR(128) NOT NULL,
+      auditValue VARCHAR(128) NOT NULL,
+      updateIdent INTEGER NOT NULL DEFAULT 0,
+      UNIQUE(auditKey)
+    );
+    DELETE FROM files; 
+    DELETE FROM sqlite_sequence WHERE name='files';
+    DELETE FROM audit; 
+    DELETE FROM sqlite_sequence WHERE name='audit';
+    VACUUM;
   `;
 
 export const SQL_insert = `
@@ -122,3 +133,24 @@ export const SQL_insert = `
 export const SQL_update = `
     UPDATE files SET updateIdent = updateIdent + 1 WHERE fullPath = ?
   `;
+
+
+export async function writeAudit(db, key, value, flush = true) {
+  const sql = `
+    INSERT INTO audit (auditKey, auditValue)
+    VALUES (?, ?)
+  `;
+
+  try {
+    await db.run(sql, [key, value]);
+    console.log(`✅ Audit added: ${key} → ${value}`);
+
+    if (flush) {
+      // Optional: force WAL checkpoint to flush changes to disk
+      await db.run('PRAGMA wal_checkpoint(FULL)');
+      console.log('🧾 WAL checkpoint triggered — data flushed to disk.');
+    }
+  } catch (err) {
+    console.error('❌ Failed to write audit entry:', err);
+  }
+}
