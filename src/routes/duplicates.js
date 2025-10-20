@@ -1,5 +1,4 @@
 import 'dotenv/config';
-
 import express from 'express';
 import sqlite3 from 'sqlite3';
 import { promisify } from 'util';
@@ -20,6 +19,7 @@ router.get('/', async (req, res) => {
       ORDER BY count DESC
     `);
 
+    console.log('rows =', rows)
     res.render('duplicates', {
       duplicates: rows,
       hash: null

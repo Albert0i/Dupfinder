@@ -1,22 +1,66 @@
-<div class="max-w-3xl mx-auto mt-10 p-6 bg-white shadow rounded">
-    <h1 class="text-2xl font-bold mb-4">Duplicate Hashes</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Possible Duplicates</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <script src="/assets/tailwind.js"></script>  
+</head>
+<body class="bg-gray-100 text-gray-900 h-screen flex items-center justify-center">
+
+  <section class="w-full max-w-3xl h-[90vh] flex flex-col justify-between p-6 bg-white shadow-lg rounded-lg">
+
+      <!-- 🌀 Header -->
+      <header class="text-center mb-4">
+        <h1 class="text-4xl font-bold">
+          <span class="font-normal">dup</span><span class="font-extrabold text-gray-900">Finder</span>
+        </h1>
+      </header>
+
+      <!-- 📊 Main -->
+      <main class="max-w-3xl mx-auto py-4 px-4">
+        <h1 class="text-xl font-semibold mb-6 text-gray-900">Possible Duplicates</h1>
+    
+        <% if (duplicates.length === 0) { %>
+          <div class="text-gray-700 italic mb-6">No duplicates found. All entries are unique.</div>
+        <% } else { %>
+          <ul class="space-y-4">
+            <% duplicates.forEach((entry, index) => { %>
+              <li class="border border-gray-700 rounded-lg bg-white shadow-sm p-4">
+                <div class="flex justify-between items-center">
+                  <div>
+                    <div class="text-md text-black font-bold"># <%= index + 1 %></div>
+                    <div class="font-mono text-sm text-blue-700 break-all"><%= entry.hash %></div>
+                    <div class="text-xs text-gray-700 mt-1">Count: <%= entry.count %></div>
+                  </div>
+                  <form method="GET" action="/duplicates/<%= entry.hash %>">
+                    <button class="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-800 transition">
+                      Inspect
+                    </button>
+                  </form>
+                </div>
+              </li>
+            <% }) %>
+          </ul>
+        <% } %>
+    
+        <div class="mt-10 text-center text-sm text-gray-400">
+          <a href="/dashboard" class="underline hover:text-indigo-500">← Return to Dashboard</a>
+        </div>
+      </main>
+
+      <!-- Copilot Credit -->
+    <footer class="m-4 text-center text-sm text-gray-700">
+      <p>
+        Crafted with quiet guidance by 
+        <a href="https://copilot.microsoft.com" target="_blank" class="text-blue-600 font-semibold hover:underline">
+          Microsoft Copilot
+        </a> — <br />your companion in code.
+      </p>
+    </footer>
+
+  </section>
   
-    <% if (hash) { %>
-      <h2 class="text-lg font-semibold mb-2">Files with hash: <code><%= hash %></code></h2>
-      <ul class="list-disc pl-6 text-gray-700">
-        <% duplicates.forEach(file => { %>
-          <li><%= file.path %> — <%= file.createdAt %></li>
-        <% }) %>
-      </ul>
-    <% } else { %>
-      <ul class="list-disc pl-6 text-gray-700">
-        <% duplicates.forEach(row => { %>
-          <li>
-            <a href="/duplicates/<%= row.hash %>" class="text-blue-600 hover:underline">
-              <%= row.hash %>
-            </a> — <%= row.count %> copies
-          </li>
-        <% }) %>
-      </ul>
-    <% } %>
-  </div>
+</body>
+</html>
