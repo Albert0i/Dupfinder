@@ -9,7 +9,7 @@
 </head>
 <body class="bg-gray-100 text-gray-900 h-screen flex items-center justify-center">
 
-  <section class="w-full max-w-3xl h-[90vh] flex flex-col justify-between p-6 bg-white shadow-lg rounded-lg">
+  <section class="w-full max-w-5xl h-[90vh] flex flex-col justify-between p-6 bg-white shadow-lg rounded-lg">
 
       <!-- 🌀 Header -->
       <header class="text-center mb-4">
@@ -35,7 +35,7 @@
                     <div class="text-xs text-gray-700 mt-1">Count: <%= entry.count %></div>
                   </div>
                   <form method="GET" action="/duplicates/<%= entry.hash %>">
-                    <button class="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-800 transition">
+                    <button class="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition">
                       Inspect
                     </button>
                   </form>

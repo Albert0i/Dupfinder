@@ -9,20 +9,21 @@
 </head>
 <body class="bg-gray-100 text-gray-900 h-screen flex items-center justify-center">
 
-  <section class="w-full max-w-3xl h-[90vh] flex flex-col justify-between p-6 bg-white shadow-lg rounded-lg">
+  <section class="w-full max-w-4xl h-[90vh] flex flex-col justify-between p-6 bg-white shadow-lg rounded-lg">
 
     <!-- 🌀 Header -->
-    <header class="text-center mb-4">
+    <header id="reloadHeader" class="text-center mb-4 hover:cursor-pointer" title="Click to refresh">
       <h1 class="text-4xl font-bold">
         <span class="font-normal">dup</span><span class="font-extrabold text-gray-900">Finder</span>
       </h1>
-      <p class="text-gray-900 italic mt-2">        
-        Some people create redundancy on purpose, while many others do so by accident.
-      </p>
+      <p class="text-gray-900 italic mt-2">
+        Some people create redundancy on purpose, while many others do so by accident.<br />
+        Chances are… you need to find your long lost twin brothers...
+      </p>    
     </header>
 
     <!-- 📊 Main -->
-    <main class="flex-grow flex flex-col justify-center cursor-pointer" onclick="window.location.href='/duplicates'">
+    <main class="flex-grow flex flex-col justify-center hover:cursor-pointer" onclick="window.location.href='/duplicates'">
 
       <div class="grid grid-cols-2 gap-6 text-center">
         <div class="bg-blue-50 p-8 rounded-lg shadow">
@@ -38,7 +39,7 @@
 
     </main>
 
-    <section class="flex-grow flex flex-col justify-center cursor-pointer" >
+    <section class="flex-grow flex flex-col justify-center" >
       <div class="mt-6 text-center text-lg text-black">
         <p class="mt-1">
           Scanned folder: <code class="bg-gray-100 px-2 py-1 rounded">
@@ -51,8 +52,8 @@
         </p>
 
         <input type="checkbox" id="autoReloadToggle" />
-        <label for="autoReloadToggle" class="text-sm text-gray-700">
-          Auto reload every 5 seconds
+        <label for="autoReloadToggle" class="text-sm text-gray-900">
+          Reload every 5 seconds
         </label>
       </div>      
     </section>
@@ -116,6 +117,11 @@
         localStorage.removeItem('autoReloadEnabled');
       }
     }
+
+    document.getElementById('reloadHeader').addEventListener('click', () => {
+      location.reload();
+    });
+
   </script>
 
 </body>

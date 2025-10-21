@@ -100,10 +100,11 @@ export const ignoreExtensions = [
 export const SQL_create_table = `
     CREATE TABLE IF NOT EXISTS files (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      fileName VARCHAR(128) NOT NULL,
+      fileName VARCHAR(255) NOT NULL,
       fullPath VARCHAR(255) NOT NULL,
       fileFormat VARCHAR(16) NOT NULL,
       fileSize INTEGER NOT NULL,
+      description text NOT NULL DEFAULT '',
       hash CHAR(64) NOT NULL,
       indexedAt VARCHAR(24) NOT NULL,
       createdAt VARCHAR(24) NOT NULL,
