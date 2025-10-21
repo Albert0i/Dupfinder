@@ -10,7 +10,7 @@ import { hashFile, walk, SQL_create_table, SQL_insert, SQL_update, writeAudit } 
 const BATCH_SIZE = process.env.BATCH_SIZE || 1000;
 // Optimal configuration: MAX_WORKERS = 8
 // Elapsed: 430.45s, Difference: 0
-const MAX_WORKERS = 8; 
+const MAX_WORKERS = process.env.MAX_WORKERS || 4
 
 const queue = [];                   // Task queue for pending files
 let enqueuedCount = 0;              // Number of files queued
@@ -162,7 +162,7 @@ async function main() {
 
   // Write audit
   await writeAudit(db, 'scanFolder', ROOT_FOLDER);
-  await writeAudit(db, 'mode', 'single');
+  await writeAudit(db, 'mode', `concurrent, ${MAX_WORKERS} workers`);
   
   const startTime = new Date(); // ✅ creates a Date object
   await writeAudit(db, 'startTime', startTime.toISOString());

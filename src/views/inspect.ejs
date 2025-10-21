@@ -33,6 +33,15 @@
         .catch(err => alert('Failed to copy: ' + err));
     }
   </script>
+  <%
+  function formatSize(bytes) {
+    const kb = bytes / 1024;
+    const mb = kb / 1024;
+    if (mb >= 1) return `${mb.toFixed(2)} MB`;
+    if (kb >= 1) return `${kb.toFixed(2)} KB`;
+    return `${bytes} bytes`;
+  }
+  %>
 </head>
 <body class="bg-gray-100 text-gray-900 flex items-center justify-center">
 
@@ -70,6 +79,8 @@
                             <%= file.fullPath %>
                         </span>
                     </p>
+                    <p class="text-md text-black">File Size: <%= formatSize(file.fileSize) %></p>
+                    <p class="text-md text-black">Modified at: <%= file.modifiedAt %></p>
                     <p class="text-md text-black">Created at: <%= file.createdAt %></p>
                   </div>
 

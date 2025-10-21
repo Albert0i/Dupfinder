@@ -3,27 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <title>Scan Info</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-50 text-gray-800 p-6">
-  <div class="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6">
-    <h1 class="text-2xl font-bold mb-4">Scan Summary</h1>
+  <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6">
+    <h1 class="text-3xl font-bold mb-6">📜 Scan Summary</h1>
 
-    <div class="grid grid-cols-2 gap-4 text-sm">
-      <div><span class="font-semibold">Scan Folder:</span> <%= info.scanFolder %></div>
-      <div><span class="font-semibold">Mode:</span> <%= info.mode %></div>
-      <div><span class="font-semibold">Start Time:</span> <%= info.startTime %></div>
-      <div><span class="font-semibold">End Time:</span> <%= info.endTime %></div>
-      <div><span class="font-semibold">Elapsed Time:</span> <%= info.elapsedTime %> seconds</div>
-      <div><span class="font-semibold">Files Enqueued:</span> <%= info.enqueuedTotal %></div>
-      <div><span class="font-semibold">Files Processed:</span> <%= info.filesProcessed %></div>
-      <div><span class="font-semibold">Difference:</span> <%= info.difference %></div>
-      <div><span class="font-semibold">Files Skipped:</span> <%= info.filesSkipped %></div>
-      <div><span class="font-semibold">Missing Files:</span> <%= info.missingFiles %></div>
-    </div>
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-2">Audit Metadata</h2>
+      <div class="grid grid-cols-2 gap-4 text-sm">
+        <div><span class="font-semibold">Scan Folder:</span> <%= info.scanFolder %></div>
+        <div><span class="font-semibold">Mode:</span> <%= info.mode %></div>
+        <div><span class="font-semibold">Start Time:</span> <%= info.startTime %></div>
+        <div><span class="font-semibold">End Time:</span> <%= info.endTime %></div>
+        <div><span class="font-semibold">Elapsed Time:</span> <%= info.elapsedTime %> seconds</div>
+        <div><span class="font-semibold">Files Enqueued:</span> <%= info.enqueuedTotal %></div>
+        <div><span class="font-semibold">Files Processed:</span> <%= info.filesProcessed %></div>
+        <div><span class="font-semibold">Difference:</span> <%= info.difference %></div>
+        <div><span class="font-semibold">Files Skipped:</span> <%= info.filesSkipped %></div>
+        <div><span class="font-semibold">Missing Files:</span> <%= info.missingFiles %></div>
+      </div>
+    </section>
 
-    <div class="mt-6 text-center">
-      <a href="/" class="text-blue-600 hover:underline">Return to Dashboard</a>
+    <section>
+      <h2 class="text-xl font-semibold mb-2">File Index Summary</h2>
+      <div class="grid grid-cols-2 gap-4 text-sm">
+        <div><span class="font-semibold">Total Files Indexed:</span> <%= info.totalFilesIndexed %></div>
+        <div><span class="font-semibold">Total Size:</span> <%= (info.totalSizeBytes / 1024 / 1024).toFixed(2) %> MB</div>
+        <div><span class="font-semibold">Average File Size:</span> <%= (info.averageFileSize / 1024).toFixed(2) %> KB</div>
+        <div><span class="font-semibold">Most Common Format:</span> <%= info.mostCommonFormat %></div>
+        <div><span class="font-semibold">Latest Indexed At:</span> <%= info.latestIndexedAt %></div>
+        <div><span class="font-semibold">Earliest Created At:</span> <%= info.earliestCreatedAt %></div>
+        <div><span class="font-semibold">Latest Modified At:</span> <%= info.latestModifiedAt %></div>
+      </div>
+    </section>
+
+    <div class="mt-8 text-center">
+      <a href="/" class="text-blue-600 hover:underline">← Return to Dashboard</a>
     </div>
   </div>
 </body>
