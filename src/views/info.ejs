@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scan Info</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 text-gray-800 p-6">
+  <div class="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6">
+    <h1 class="text-2xl font-bold mb-4">Scan Summary</h1>
+
+    <div class="grid grid-cols-2 gap-4 text-sm">
+      <div><span class="font-semibold">Scan Folder:</span> <%= info.scanFolder %></div>
+      <div><span class="font-semibold">Mode:</span> <%= info.mode %></div>
+      <div><span class="font-semibold">Start Time:</span> <%= info.startTime %></div>
+      <div><span class="font-semibold">End Time:</span> <%= info.endTime %></div>
+      <div><span class="font-semibold">Elapsed Time:</span> <%= info.elapsedTime %> seconds</div>
+      <div><span class="font-semibold">Files Enqueued:</span> <%= info.enqueuedTotal %></div>
+      <div><span class="font-semibold">Files Processed:</span> <%= info.filesProcessed %></div>
+      <div><span class="font-semibold">Difference:</span> <%= info.difference %></div>
+      <div><span class="font-semibold">Files Skipped:</span> <%= info.filesSkipped %></div>
+      <div><span class="font-semibold">Missing Files:</span> <%= info.missingFiles %></div>
+    </div>
+
+    <div class="mt-6 text-center">
+      <a href="/" class="text-blue-600 hover:underline">Return to Dashboard</a>
+    </div>
+  </div>
+</body>
+</html>
