@@ -1,18 +1,13 @@
 import 'dotenv/config';
 import express from 'express';
-import sqlite3 from 'sqlite3';
-import { promisify } from 'util';
 import fs from 'fs/promises';
+import { db } from '../sqlite.js'
 
 const router = express.Router();
-const db = new sqlite3.Database(process.env.DB_PATH);
-
-// Promisify db.all
-const dbAll = promisify(db.all).bind(db);
 
 router.get('/', async (req, res) => {
   try {
-    const rows = await dbAll(`
+    const rows = await db.all(`
       SELECT hash, COUNT(*) AS count,
              GROUP_CONCAT(filename, ', ') AS filenames
       FROM files
@@ -34,9 +29,8 @@ router.get('/', async (req, res) => {
 router.get('/:hash', async (req, res) => {
   const hash = req.params.hash;
 
-  console.log('hash =', hash)
   try {
-    const rows = await dbAll(`
+    const rows = await db.all(`
       SELECT * FROM files
       WHERE hash = ?
       ORDER BY createdAt DESC
@@ -58,13 +52,13 @@ router.delete('/:id', async (req, res) => {
   console.log('id =', id)
   try {
     // Fetch the file entry
-    const row = await dbGet(`SELECT fullPath FROM files WHERE id = ?`, [id]);
+    const row = await db.get(`SELECT fullPath FROM files WHERE id = ?`, [id]);
 
     if (!row) {
       return res.status(404).json({ error: 'File not found' });
     }
 
-    console.log('fullPath =', fullPath)
+    console.log('row =', row)
     // Delete from disk
     try {
       await fs.unlink(row.fullPath);
@@ -75,7 +69,7 @@ router.delete('/:id', async (req, res) => {
     }
 
     // Delete from database
-    await dbRun(`DELETE FROM files WHERE id = ?`, [id]);
+    await db.run(`DELETE FROM files WHERE id = ?`, [id]);
 
     res.status(200).json({ message: `File with id ${id} deleted` });
   } catch (err) {
