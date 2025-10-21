@@ -6,6 +6,16 @@
   <title>Possible Duplicates</title>
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <script src="/assets/tailwind.js"></script>  
+  <% 
+  function removeDuplicates(input) {
+    return [...new Set(
+      input
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean)
+    )].join(', ');
+  }
+  %>
 </head>
 <body class="bg-gray-100 text-gray-900 flex items-center justify-center">
 
@@ -32,7 +42,8 @@
                   <div>
                     <div class="text-xl text-black font-bold">Case # <%= index + 1 %></div>
                     <div class="font-mono text-md text-blue-700 break-all">
-                      <%= entry.filenames.length > 128 ? entry.filenames.slice(0, 128) + '...' : entry.filenames %>
+                      <% const tmpNames = removeDuplicates(entry.filenames) %>
+                      <%= tmpNames.length > 160 ? tmpNames.slice(0, 160) + '...' : tmpNames %>                      
                     </div>
                     <div class="text-ms text-black mt-1">Count: <%= entry.count %></div>
                   </div>

@@ -87,7 +87,7 @@ export const ignoreList = [
   'Program Files (x86)', 'Windows', 'AppData', 'Local Settings', 'Recovery',
   'PerfLogs', 'Temp', 'Tmp',  'cache', 'Cache', 
   '__MACOSX', '.Spotlight-V100', '.Trashes', 'ehthumbs.db', 'pagefile.sys',
-  'hiberfil.sys', 'swapfile.sys'
+  'hiberfil.sys', 'swapfile.sys', '.gitignore'
 ];
 
 // 🛡️ Ignore extensions: skip files with these suffixes
@@ -154,4 +154,13 @@ export async function writeAudit(db, key, value, flush = true) {
   } catch (err) {
     console.error('❌ Failed to write audit entry:', err);
   }
+}
+
+export function removeDuplicates(input) {
+  return [...new Set(
+    input
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean)
+  )].join(', ');
 }

@@ -49,7 +49,6 @@ router.get('/:hash', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   const id = req.params.id;
   
-  console.log('id =', id)
   try {
     // Fetch the file entry
     const row = await db.get(`SELECT fullPath FROM files WHERE id = ?`, [id]);
@@ -58,18 +57,18 @@ router.delete('/:id', async (req, res) => {
       return res.status(404).json({ error: 'File not found' });
     }
 
-    console.log('row =', row)
-    // Delete from disk
     try {
+      // Abort if disk deletion fails...
       await fs.unlink(row.fullPath);
-      console.log(`Deleted file from disk: ${row.fullPath}`);
-    } catch (err) {
-      console.warn(`Failed to delete file from disk: ${row.fullPath}`, err.message);
-      // Continue with DB deletion even if disk deletion fails
-    }
+      console.log(`Deleted file from disk: fullPath = ${row.fullPath}`);
 
-    // Delete from database
-    await db.run(`DELETE FROM files WHERE id = ?`, [id]);
+      // Delete from database
+      const result = await db.run(`DELETE FROM files WHERE id = ?`, [id]);
+      console.log(`Deleted file from database: id = ${id}, rows affected = ${result.changes}`);
+    } catch (err) {
+      console.warn(`Failed on deletion: fullPath = ${row.fullPath}, id = ${id}`);
+      console.log(err.messsage)      
+    }
 
     res.status(200).json({ message: `File with id ${id} deleted` });
   } catch (err) {
