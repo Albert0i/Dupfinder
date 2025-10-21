@@ -4,11 +4,9 @@
 import 'dotenv/config';
 import fs from 'fs/promises';
 import path from 'path';
-import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
+import { db } from './sqlite.js'
 import { hashFile, walk, SQL_create_table, SQL_insert, SQL_update, writeAudit } from './utils.js'
 
-const DB_PATH = process.env.DB_PATH || './data/db.sq3';
 const BATCH_SIZE = process.env.BATCH_SIZE || 1000;
 // Optimal configuration: MAX_WORKERS = 8
 // Elapsed: 430.45s, Difference: 0
@@ -152,8 +150,7 @@ async function processQueueLoop(db, insertStmt, updateStmt, queue) {
 // 🧱 Main ritual: setup DB, scan folder, insert records
 async function main() {
   await fs.mkdir('./data', { recursive: true });
-  const db = await open({ filename: DB_PATH, driver: sqlite3.Database });
-
+  
   // 🧾 Create table if not exists
   await db.exec(SQL_create_table);
 
