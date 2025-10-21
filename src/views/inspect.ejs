@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Inspect Duplicates</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <script src="/assets/tailwind.js"></script>  
+
+  <script>
+    async function deleteFile(id) {
+      if (confirm(`Are you sure you want to delete "${filename}"? This will remove it from the database and disk.`)) {
+        try {
+          const res = await fetch(`/duplicates/${id}`, {
+            method: 'DELETE'
+          });
+          if (res.ok) {
+            location.reload();
+          } else {
+            alert('Failed to delete file.');
+          }
+        } catch (err) {
+          alert('Error deleting file.');
+        }
+      }
+    }
+  </script>
+  <script>
+    function copyToClipboard(text) {
+      text.replace('\\\\', '\\')
+
+      navigator.clipboard.writeText(text)
+        .then(() => console.log(`${text} copied to clipboard!`))
+        .catch(err => alert('Failed to copy: ' + err));
+    }
+  </script>
+</head>
+<body class="bg-gray-100 text-gray-900 flex items-center justify-center">
+
+    <section class="w-full max-w-5xl flex flex-col justify-between p-6 bg-white shadow-lg rounded-lg">
+
+        <!-- 🌀 Header -->
+        <header class="text-center mb-4">
+        <h1 class="text-4xl font-bold">
+            <span class="font-normal">dup</span><span class="font-extrabold text-gray-900">Finder</span>
+        </h1>
+        </header>
+
+      <!-- 📊 Main -->
+      <main class="max-w-4xl py-4 px-4">
+        <h1 class="text-xl font-semibold mb-6 text-gray-900">Inspect Duplicates</h1>
+        <p class="text-md text-black mb-6">Hash: <span class="font-mono text-blue-600"><%= hash %></span></p>
+
+        <% if (duplicates.length === 0) { %>
+            <p class="text-gray-700">No files found for this hash.</p>
+          <% } else { %>
+            <ul class="space-y-4">
+              <% duplicates.forEach(file => { %>
+                <li class="flex justify-between items-center bg-gray-50 p-4 rounded border">
+                  <div class="flex-1">
+                    <p class="text-md font-medium text-black">
+                      Filename: <%= file.fileName %>
+                    </p>
+                    <p class="text-md text-black">Path: 
+                        <span onclick="copyToClipboard('<%= file.fullPath.replace(/\\/g, '\\\\') %>')"
+                                class="text-blue-600 hover:underline cursor-pointer"
+                                title="Click to copy path">
+                            <%= file.fullPath %>
+                        </span>
+                    </p>
+                    <p class="text-md text-black">Created at: <%= file.createdAt %></p>
+                  </div>
+                  <button onclick="deleteFile(<%= file.id %>)" 
+                          class="ml-4 px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700">
+                    Delete
+                  </button>
+                </li>
+              <% }) %>
+            </ul>
+          <% } %>
+
+      </main>
+
+      <div class="flex justify-center items-center h-16">
+        <button onclick="window.history.back()"
+                class="inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition cursor-pointer mr-24">
+          Back
+        </button>
+  
+        <a href="/" class="inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+          Back to Main
+        </a>
+      </div>
+
+      <!-- Copilot Credit -->
+      <footer class="m-4 text-center text-sm text-gray-700">
+        <p>
+          Crafted with quiet guidance by 
+          <a href="https://copilot.microsoft.com" target="_blank" class="text-blue-600 font-semibold hover:underline">
+            Microsoft Copilot
+          </a> — <br />your companion in code.
+        </p>
+      </footer>
+
+  </section>
+</body>
+</html>

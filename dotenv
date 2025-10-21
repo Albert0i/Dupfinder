@@ -6,3 +6,6 @@ DB_PATH='./data/db.sq3'
 
 # Batch size for inserts and updates
 BATCH_SIZE=1000
+
+# MAX return limit
+MAX_LIMIT=9999
