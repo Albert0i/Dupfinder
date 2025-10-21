@@ -48,7 +48,9 @@
       <!-- 📊 Main -->
       <main class="max-w-4xl py-4 px-4">
         <h1 class="text-xl font-semibold mb-6 text-gray-900">Inspect Duplicates</h1>
-        <p class="text-md text-black mb-6">Hash: <span class="font-mono text-blue-600"><%= hash %></span></p>
+        <p class="text-md text-black mb-6">Hash: 
+          <span class="font-mono text-blue-600"><%= hash %> (<%= count %>)</span>
+        </p>
 
         <% if (duplicates.length === 0) { %>
             <p class="text-gray-700">No files found for this hash.</p>
@@ -59,21 +61,36 @@
                   <div class="flex-1">
                     <p class="text-md font-medium text-black">
                       Filename: 
-                      <%= file.fileName.length > 80 ? file.fileName.slice(0, 80) + '...' : file.fileName %>
+                      <%= file.fileName.length > 88 ? file.fileName.slice(0, 88) + '...' : file.fileName %>
                     </p>
                     <p class="text-md text-black">Path: 
                         <span onclick="copyToClipboard('<%= file.fullPath.replace(/\\/g, '\\\\') %>')"
                                 class="text-blue-600 hover:underline cursor-pointer"
                                 title="Click to copy path">
-                            <%= file.fullPath.length > 80 ? file.fullPath.slice(0, 80) + '...' : file.fullPath %>
+                            <%= file.fullPath %>
                         </span>
                     </p>
                     <p class="text-md text-black">Created at: <%= file.createdAt %></p>
                   </div>
-                  <button onclick="deleteFile('<%= file.id %>', '<%= file.fileName %>')" 
+
+                  <!-- <button onclick="deleteFile('<%= file.id %>', '<%= file.fileName %>')" 
                           class="ml-4 px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700">
                     Delete
-                  </button>
+                  </button> -->
+                  <div class="flex flex-col space-y-2">
+                    <!-- View Button -->
+                    <a href="/view/<%= file.id %>" 
+                       class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded text-center" target="_blank">
+                      View
+                    </a>
+
+                    <!-- Delete Button -->
+                    <button onclick="deleteFile('<%= file.id %>', '<%= file.fileName %>')" 
+                      class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded">
+                      Delete
+                    </button>
+                  </div>
+
                 </li>
               <% }) %>
             </ul>

@@ -35,10 +35,17 @@ router.get('/:hash', async (req, res) => {
       WHERE hash = ?
       ORDER BY createdAt DESC
     `, [hash]);
+    
+    const value = await db.get(`
+      SELECT count(*) as count FROM files
+      WHERE hash = ?
+      ORDER BY createdAt DESC
+    `, [hash]);
 
     res.render('inspect', {
       duplicates: rows, 
-      hash
+      hash,
+      count: value.count 
     });
   } catch (err) {
     console.error('Database error:', err);

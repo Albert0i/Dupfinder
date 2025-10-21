@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>File Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 text-gray-800 p-6">
+  <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6">
+    <h1 class="text-2xl font-bold mb-4">File Content</h1>
+
+    <div class="border border-gray-300 rounded p-4 overflow-auto bg-gray-100">
+      <%- content %>
+    </div>
+
+    <div class="mt-6">
+      <a href="javascript:window.close()" class="text-blue-600 hover:underline">Close Window</a>
+    </div>
+  </div>
+</body>
+</html>
