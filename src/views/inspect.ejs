@@ -57,9 +57,9 @@
 
       <!-- 📊 Main -->
       <main class="max-w-4xl py-4 px-4">
-        <h1 class="text-xl font-semibold mb-6 text-gray-900">Inspect Duplicates</h1>
+        <h1 class="text-xl font-semibold mb-6 text-gray-900">Inspect Duplicates (<%= duplicates.length %>)</h1>
         <p class="text-md text-black mb-6">Hash: 
-          <span class="font-mono text-blue-600"><%= hash %> (<%= duplicates.length %>)</span>
+          <span class="font-mono text-blue-600"><%= hash %></span>
         </p>
 
         <% if (duplicates.length === 0) { %>
