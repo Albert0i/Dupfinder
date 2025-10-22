@@ -1,47 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Scan Info</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dupFinder Info</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <script src="/assets/tailwind.js"></script>  
+  <% function formatBytes(bytes) {
+    if (bytes === 0 || bytes == null) return '0 B';
+    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    const value = bytes / Math.pow(1024, i);
+    return `${value.toFixed(2)} ${units[i]}`;
+  } %>
 </head>
-<body class="bg-gray-50 text-gray-800 p-6">
-  <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6">
-    <h1 class="text-3xl font-bold mb-6">📜 Scan Summary</h1>
+<body class="bg-gray-100 text-gray-900 flex items-center justify-center">
 
-    <section class="mb-8">
-      <h2 class="text-xl font-semibold mb-2">Audit Metadata</h2>
-      <div class="grid grid-cols-2 gap-4 text-sm">
-        <div><span class="font-semibold">Scan Folder:</span> <%= info.scanFolder %></div>
-        <div><span class="font-semibold">Mode:</span> <%= info.mode %></div>
-        <div><span class="font-semibold">Start Time:</span> <%= info.startTime %></div>
-        <div><span class="font-semibold">End Time:</span> <%= info.endTime %></div>
-        <div><span class="font-semibold">Elapsed Time:</span> <%= info.elapsedTime %> seconds</div>
-        <div><span class="font-semibold">Files Enqueued:</span> <%= info.enqueuedTotal %></div>
-        <div><span class="font-semibold">Files Processed:</span> <%= info.filesProcessed %></div>
-        <div><span class="font-semibold">Difference:</span> <%= info.difference %></div>
-        <div><span class="font-semibold">Files Skipped:</span> <%= info.filesSkipped %></div>
-        <div><span class="font-semibold">Missing Files:</span> <%= info.missingFiles %></div>
-      </div>
-    </section>
+  <section class="w-full max-w-4xl flex flex-col justify-between p-6 bg-white shadow-lg rounded-lg">
+    <!-- 🌀 Header -->
+    <header id="reloadHeader" class="text-center mb-4 hover:cursor-pointer" title="Click to refresh">
+      <h1 class="text-4xl font-bold">
+        <span class="font-normal">dup</span><span class="font-extrabold text-gray-900">Finder</span>
+      </h1>
+    </header>
 
-    <section>
-      <h2 class="text-xl font-semibold mb-2">File Index Summary</h2>
-      <div class="grid grid-cols-2 gap-4 text-sm">
-        <div><span class="font-semibold">Total Files Indexed:</span> <%= info.totalFilesIndexed %></div>
-        <div><span class="font-semibold">Total Size:</span> <%= (info.totalSizeBytes / 1024 / 1024).toFixed(2) %> MB</div>
-        <div><span class="font-semibold">Average File Size:</span> <%= (info.averageFileSize / 1024).toFixed(2) %> KB</div>
-        <div><span class="font-semibold">Most Common Format:</span> <%= info.mostCommonFormat %></div>
-        <div><span class="font-semibold">Latest Indexed At:</span> <%= info.latestIndexedAt %></div>
-        <div><span class="font-semibold">Earliest Created At:</span> <%= info.earliestCreatedAt %></div>
-        <div><span class="font-semibold">Latest Modified At:</span> <%= info.latestModifiedAt %></div>
-      </div>
-    </section>
+    <main>
+      <!-- Audit Metadata Table -->
+      <section class="mb-10">
+        <h2 class="text-xl font-semibold mb-4">Audit Metadata</h2>
+        <table class="w-full bg-white rounded shadow">
+          <thead class="bg-gray-200 text-left">
+            <tr>
+              <th class="px-4 py-2 w-1/2">Key</th>
+              <th class="px-4 py-2 w-1/2">Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% Object.entries(info).forEach(([key, value]) => {
+              if (!['totalFilesIndexed', 'totalSizeBytes', 'averageFileSize', 'latestIndexedAt', 'earliestCreatedAt', 'latestModifiedAt', 'topFileFormats'].includes(key)) { %>
+                <tr class="border-t">
+                  <td class="px-4 py-2 font-medium"><%= key %></td>
+                  <td class="px-4 py-2"><%= value %></td>
+                </tr>
+            <% } }) %>
+          </tbody>
+        </table>
+      </section>
+  
+      <!-- File Statistics Table -->
+      <section class="mb-10">
+        <h2 class="text-xl font-semibold mb-4">File Statistics</h2>
+        <table class="w-full bg-white rounded shadow">
+          <thead class="bg-gray-200 text-left">
+            <tr>
+              <th class="px-4 py-2 w-1/2">Metric</th>
+              <th class="px-4 py-2 w-1/2">Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-t">
+              <td class="px-4 py-2 font-medium">Total Files Indexed</td>
+              <td class="px-4 py-2"><%= info.totalFilesIndexed %></td>
+            </tr>
+            <tr class="border-t">
+              <td class="px-4 py-2 font-medium">Total Size</td>
+              <td class="px-4 py-2"><%= formatBytes(info.totalSizeBytes) %></td>
+            </tr>
+            <tr class="border-t">
+              <td class="px-4 py-2 font-medium">Average File Size</td>
+              <td class="px-4 py-2"><%= formatBytes(info.averageFileSize) %></td>
+            </tr>
+            <tr class="border-t">
+              <td class="px-4 py-2 font-medium">Latest Indexed At</td>
+              <td class="px-4 py-2"><%= info.latestIndexedAt %></td>
+            </tr>
+            <tr class="border-t">
+              <td class="px-4 py-2 font-medium">Earliest Created At</td>
+              <td class="px-4 py-2"><%= info.earliestCreatedAt %></td>
+            </tr>
+            <tr class="border-t">
+              <td class="px-4 py-2 font-medium">Latest Modified At</td>
+              <td class="px-4 py-2"><%= info.latestModifiedAt %></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
 
-    <div class="mt-8 text-center">
-      <a href="/" class="text-blue-600 hover:underline">← Return to Dashboard</a>
-    </div>
-  </div>
+      <!-- Top File Formats Table -->
+      <section>
+        <h2 class="text-xl font-semibold mb-4">Top 10 File Formats</h2>
+        <table class="w-full bg-white rounded shadow">
+          <thead class="bg-gray-200 text-left">
+            <tr>
+              <th class="px-4 py-2 w-1/2">Format</th>
+              <th class="px-4 py-2 w-1/2">Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% info.topFileFormats.forEach(format => { %>
+              <tr class="border-t">
+                <td class="px-4 py-2 font-medium"><%= format.fileFormat %></td>
+                <td class="px-4 py-2"><%= format.count %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </section>
+    </main>
+    
+    <!-- Copilot Credit -->
+    <footer class="m-4 text-center text-sm text-gray-700">
+      <p>
+        Crafted with quiet guidance by 
+        <a href="https://copilot.microsoft.com" target="_blank" class="text-blue-600 font-semibold hover:underline">
+          Microsoft Copilot
+        </a> — <br />your companion in code.
+      </p>
+    </footer>
+
+  </section>
+
 </body>
 </html>
