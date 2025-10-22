@@ -5,12 +5,14 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   try {
+    // Fetch audit metadata
     const auditRows = await db.all(`
       SELECT auditKey, auditValue
       FROM audit
       ORDER BY id ASC
     `);
 
+    // Fetch file statistics
     const fileStats = await db.all(`
       SELECT
         (SELECT COUNT(*) FROM files) AS totalFilesIndexed,
@@ -21,6 +23,7 @@ router.get('/', async (req, res) => {
         (SELECT MAX(modifiedAt) FROM files) AS latestModifiedAt
     `);
 
+    // Fetch top 10 file formats
     const topFormats = await db.all(`
       SELECT fileFormat, COUNT(*) AS count
       FROM files
@@ -37,6 +40,14 @@ router.get('/', async (req, res) => {
 
     Object.assign(info, fileStats[0]); // merge file stats
     info.topFileFormats = topFormats;  // add top 10 formats
+
+    // Fetch SQLite and VSS version
+    const versions = await db.get(`
+      SELECT sqlite_version() AS sqlite_version, vec_version() AS vec_version
+    `);
+    
+    info.sqliteVersion = versions.sqlite_version;
+    info.vecVersion = versions.vec_version;
 
     res.render('info', { info });
   } catch (err) {
