@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "single": "node src/processFolder.single.js",
     "concurrent": "node src/processFolder.concurrent.js",
-    "sql": "sqlite3 ./data/db.sq3",
+    "sql": "sqlite3 -init init.sql ./data/db.sq3",
     "dev": "nodemon src/server.js"
   },
   "keywords": [],
