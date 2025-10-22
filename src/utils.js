@@ -87,7 +87,7 @@ export const ignoreList = [
   'Program Files (x86)', 'Windows', 'AppData', 'Local Settings', 'Recovery',
   'PerfLogs', 'Temp', 'Tmp',  'cache', 'Cache', 
   '__MACOSX', '.Spotlight-V100', '.Trashes', 'ehthumbs.db', 'pagefile.sys',
-  'hiberfil.sys', 'swapfile.sys', '.gitignore', '.gitattributes'
+  'hiberfil.sys', 'swapfile.sys', '.gitignore', '.gitattributes', 'index.html'
 ];
 
 // 🛡️ Ignore extensions: skip files with these suffixes
