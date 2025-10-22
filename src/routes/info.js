@@ -1,5 +1,8 @@
+import 'dotenv/config';
 import express from 'express';
 import { db } from '../sqlite.js'
+import fs from 'fs';
+import path from 'path';
 
 const router = express.Router();
 
@@ -48,6 +51,7 @@ router.get('/', async (req, res) => {
     
     info.sqliteVersion = versions.sqlite_version;
     info.vecVersion = versions.vec_version;
+    info.dbSize = `${getDatabaseSize(process.env.DB_PATH)} MB`
 
     res.render('info', { info });
   } catch (err) {
@@ -55,6 +59,18 @@ router.get('/', async (req, res) => {
     res.status(500).render('error', { message: 'Failed to load scan info.' });
   }
 });
+
+function getDatabaseSize(dbPath) {
+  try {
+    const resolvedPath = path.resolve(dbPath);
+    const stats = fs.statSync(resolvedPath);
+        
+    return (stats.size / (1024 * 1024)).toFixed(2) // in MB
+  } catch (err) {
+    console.error(`Failed to get database size: ${err.message}`);
+    return 0;
+  }
+}
 
 /* router.get('/', async (req, res) => {
   try {
