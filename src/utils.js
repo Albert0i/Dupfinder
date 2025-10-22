@@ -2,7 +2,6 @@ import fs from 'fs/promises';
 import fsSync from 'fs';
 import path from 'path';
 import crypto from 'crypto';
-import { promisify } from 'util';
 
 // 🔍 Check if file is hidden (starts with . or $)
 export async function isHidden(filePath) {
@@ -87,12 +86,14 @@ export const ignoreList = [
   'Program Files (x86)', 'Windows', 'AppData', 'Local Settings', 'Recovery',
   'PerfLogs', 'Temp', 'Tmp',  'cache', 'Cache', 
   '__MACOSX', '.Spotlight-V100', '.Trashes', 'ehthumbs.db', 'pagefile.sys',
-  'hiberfil.sys', 'swapfile.sys', '.gitignore', '.gitattributes', 'index.html'
+  'hiberfil.sys', 'swapfile.sys', '.gitignore', '.gitattributes', 'index.html',
+  '$RECYCLE.BIN', '.env', '.dockerignore'
 ];
 
 // 🛡️ Ignore extensions: skip files with these suffixes
 export const ignoreExtensions = [
-  '.aof', '.incr.aof', '.tmp', '.dmp', '.log'
+  '.aof', '.incr.aof', '.tmp', '.dmp', '.log', 
+  '.tmp', '.dump', '.txt~', '.lnk'
 ];
 
 
