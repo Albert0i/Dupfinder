@@ -5,6 +5,7 @@ import dashboardRouter from './routes/dashboard.js';
 import duplicatesRouter from './routes/duplicates.js';
 import viewRouter from './routes/view.js';
 import infoRouter from './routes/info.js';
+import apiRouter from './routes/api.js'
 
 const app = express();
 const HOST = process.env.HOST || 'localhost';
@@ -21,6 +22,7 @@ app.use('/', dashboardRouter);
 app.use('/duplicates', duplicatesRouter);
 app.use('/view', viewRouter);
 app.use('/info', infoRouter);
+app.use('/api/v1', apiRouter);
 
 app.listen(PORT, () => {
   console.log(`🌀 Server running at http://${HOST}:${PORT}`);

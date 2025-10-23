@@ -4,6 +4,8 @@ import fs from 'fs/promises';
 import { db } from '../sqlite.js'
 
 const router = express.Router();
+const HOST = process.env.HOST
+const PORT = process.env.PORT
 
 router.get('/', async (req, res) => {
   try {
@@ -30,14 +32,16 @@ router.get('/:hash', async (req, res) => {
   const hash = req.params.hash;
 
   try {
-    const rows = await db.all(`
-      SELECT * FROM files
-      WHERE hash = ?
-      ORDER BY createdAt DESC
-    `, [hash]);
+    // const rows = await db.all(`
+    //   SELECT * FROM files
+    //   WHERE hash = ?
+    //   ORDER BY createdAt DESC
+    // `, [hash]);
+    const response = await fetch(`http://${HOST}:${PORT}/api/v1/files/hash/${hash}`);
+    const data = await response.json();
     
     res.render('inspect', {
-      duplicates: rows, 
+      duplicates: data.rows, 
       hash
     });
   } catch (err) {
