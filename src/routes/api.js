@@ -86,17 +86,18 @@ router.get('/files/hash/:hash', async (req, res) => {
     }
   });  
 
-// GET /api/v1/files/id/:id — returns file metadata and content
+// GET /api/v1/files/id/:id?pathonly=true — returns file metadata and content
 router.get('/files/id/:id', async (req, res) => {
     const { id } = req.params;
+    const pathOnly = req.query.pathonly === 'true';
     
     try {
         const file = await db.get(`
-            SELECT fullPath 
-            FROM files 
-            WHERE id = ?`, [id]);
-        
-        res.json(file);  
+          SELECT ${pathOnly ? 'fullPath' : '*'} 
+          FROM files 
+          WHERE id = ?`, [id]);
+      
+        res.json(file); 
     } catch (err) {
         console.error('API error:', err);
         res.status(500).json({ error: 'Failed to read database.' });
@@ -114,7 +115,7 @@ router.delete('/files/id/:id', async (req, res) => {
         return res.status(404).json({ error: 'File not found.' });
       }
 
-      res.json({ success: true, deletedId: id });
+      res.json({ success: true, result });
     } catch (err) {
       console.error('API error:', err);
       res.status(500).json({ error: 'Failed to delete file.' });

@@ -42,7 +42,7 @@ router.delete('/:id', async (req, res) => {
   
   try {
     // Fetch the file entry
-    const response1 = await fetch(`http://${HOST}:${PORT}/api/v1/files/hash/${hash}?pathonly=true`);
+    const response1 = await fetch(`http://${HOST}:${PORT}/api/v1/files/id/${id}?pathonly=true`);
     const data = await response1.json();
 
     // Abort if disk deletion fails...
@@ -50,17 +50,17 @@ router.delete('/:id', async (req, res) => {
     console.log(`Deleted file from disk: fullPath = ${data.fullPath}`);
 
     // Delete from database
-    const response2 = await fetch(`/api/v1/files/id/${id}`, {
+    const response2 = await fetch(`http://${HOST}:${PORT}/api/v1/files/id/${id}`, {
       method: 'DELETE'
     });
 
     const result = await response2.json();
 
-    if (response.ok) {
-      //console.log('Deleted:', result.deletedId);
-      console.log(`Deleted file from database: id = ${result.deletedId}, rows affected = ${result.changes}`);    
+    // result = { success: true, result: { stmt: {}, lastID: 5, changes: 1 } }
+    if (result.success) {
+      console.log(`Delete file from database: id = ${result.result.lastID}, rows affected = ${result.result.changes}`);
     } else {
-      console.error('Delete failed:', result.error);
+      console.error('Delete failed:', result);
     }
 
     res.status(200).json({ message: `File with id ${id} deleted` });

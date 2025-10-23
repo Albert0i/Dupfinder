@@ -71,13 +71,13 @@
                   <div class="flex-1">
                     <p class="text-md font-medium text-black">
                       Filename: 
-                      <%= file.fileName.length > 88 ? file.fileName.slice(0, 88) + '...' : file.fileName %>
+                      <%= file.fileName.length > 80 ? file.fileName.slice(0, 80) + '...' : file.fileName %>
                     </p>
                     <p class="text-md text-black">Path: 
                         <span onclick="copyToClipboard('<%= file.fullPath.replace(/\\/g, '\\\\') %>')"
                                 class="text-blue-600 hover:underline cursor-pointer"
                                 title="Click to copy path">
-                            <%= file.fullPath %>
+                            <%= file.fullPath.length > 80 ? file.fullPath.slice(0, 80) + '...' : file.fullPath %>
                         </span>
                     </p>
                     <p class="text-md text-black">File Size: <%= formatSize(file.fileSize) %></p>

@@ -10,7 +10,6 @@ router.get('/', async (req, res) => {
     const response = await fetch(`http://${HOST}:${PORT}/api/v1/info`);
     const data = await response.json();
 
-    console.log('data = ', data)
     res.render('info', { info:data } );
   } catch (err) {
     console.error('Error loading audit info:', err);
