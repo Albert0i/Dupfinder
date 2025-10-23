@@ -22,9 +22,24 @@
       <main class="py-4 px-4">
         <h1 class="text-2xl font-bold mb-4">File Content</h1>
 
-        <div class="border border-gray-300 rounded p-4 overflow-auto bg-gray-100">
-          <%- content %>
-        </div>    
+        <div class="bg-gray-100 text-black font-mono text-md rounded-lg p-2 overflow-auto border border-gray-700 shadow-inner text-left">
+          <!-- <pre class="m-0 p-0 leading-snug">
+            <code>
+              <%- content %>
+            </code>
+          </pre> -->
+
+          <div class="bg-white border border-gray-300 rounded-lg shadow-md overflow-auto text-left">
+            <div class="bg-gray-100 border-b border-gray-300 px-1 py-1 text-md text-gray-600 font-bold rounded-t-lg">
+              <%= fileName %>
+            </div>
+            <pre class="m-0 p-4 font-mono font-semibold text-md text-gray-800 leading-snug whitespace-pre">
+              <code><%- content %></code>
+            </pre>
+          </div>
+
+        </div>
+
       </main>
 
       <div class="flex justify-center items-center h-12">

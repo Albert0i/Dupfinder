@@ -12,7 +12,16 @@
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
     const value = bytes / Math.pow(1024, i);
     return `${value.toFixed(2)} ${units[i]}`;
-  } %>
+  } 
+  
+  function formatTime(seconds) {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = (seconds % 60).toFixed(2);
+  
+    return `${hrs}h : ${mins}m : ${secs}s`;
+  }  
+  %>
 </head>
 <body class="bg-gray-100 text-gray-900 flex items-center justify-center">
 
@@ -41,7 +50,15 @@
               if (!['totalFilesIndexed', 'totalSizeBytes', 'averageFileSize', 'latestIndexedAt', 'earliestCreatedAt', 'latestModifiedAt', 'topFileFormats'].includes(key)) { %>
                 <tr class="border-t">
                   <td class="px-4 py-2 font-medium"><%= key %></td>
-                  <td class="px-4 py-2"><%= value %></td>
+                  <td class="px-4 py-2">
+                    <% if (key==='elapsedTime') { %> 
+                      <%= formatTime(value) %>
+                    <% } else if (key==='dbSize') { %>
+                      <%= formatBytes(value) %>
+                    <% } else { %>
+                      <%= value %>
+                    <% } %>
+                  </td>
                 </tr>
             <% } }) %>
           </tbody>
@@ -89,7 +106,7 @@
 
       <!-- Top File Formats Table -->
       <section>
-        <h2 class="text-xl font-semibold mb-4">Top 10 File Formats</h2>
+        <h2 class="text-xl font-semibold mb-4">Top <%= info.topFileFormats.length %> File Formats</h2>
         <table class="w-full bg-white rounded shadow">
           <thead class="bg-gray-200 text-left">
             <tr>

@@ -51,7 +51,7 @@ router.get('/', async (req, res) => {
     
     info.sqliteVersion = versions.sqlite_version;
     info.vecVersion = versions.vec_version;
-    info.dbSize = `${getDatabaseSize(process.env.DB_PATH)} MB`
+    info.dbSize = getDatabaseSize(process.env.DB_PATH)
 
     res.render('info', { info });
   } catch (err) {
@@ -65,7 +65,8 @@ function getDatabaseSize(dbPath) {
     const resolvedPath = path.resolve(dbPath);
     const stats = fs.statSync(resolvedPath);
         
-    return (stats.size / (1024 * 1024)).toFixed(2) // in MB
+    //return (stats.size / (1024 * 1024)).toFixed(2) // in MB
+    return stats.size // in bytes
   } catch (err) {
     console.error(`Failed to get database size: ${err.message}`);
     return 0;

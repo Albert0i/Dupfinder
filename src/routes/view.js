@@ -9,7 +9,7 @@ router.get('/:hash', async (req, res) => {
   const { hash } = req.params;
 
   try {
-    const file = await db.get('SELECT fullPath FROM files WHERE hash = ? LIMIT 1', [hash]);
+    const file = await db.get('SELECT fileName, fullPath FROM files WHERE hash = ? LIMIT 1', [hash]);
     
     if (!file || !file.fullPath) {
       return res.status(404).send('File not found.');
@@ -17,7 +17,7 @@ router.get('/:hash', async (req, res) => {
 
     const raw = fs.readFileSync(file.fullPath, 'utf-8');
     const content = raw.replace(/\n/g, '<br />');
-    res.render('view', { content });
+    res.render('view', { fileName: file.fileName, content });
   } catch (err) {
     console.error('Error sending file:', err);
     res.status(500).send('Failed to send file.');
