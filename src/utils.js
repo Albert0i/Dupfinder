@@ -92,8 +92,9 @@ export const ignoreList = [
 
 // 🛡️ Ignore extensions: skip files with these suffixes
 export const ignoreExtensions = [
-  '.aof', '.incr.aof', '.tmp', '.dmp', '.log', 
-  '.tmp', '.dump', '.txt~', '.lnk'
+  '.aof', '.incr.aof', '.tmp', '.dmp', '.log',
+  '.dump', '.txt~', '.lnk', '.bak', '.swp', 
+  '.DS_Store', 'desktop.ini', '.env', '.env.development', '.env.production'
 ];
 
 

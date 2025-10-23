@@ -17,7 +17,10 @@ router.get('/:hash', async (req, res) => {
 
     const raw = fs.readFileSync(file.fullPath, 'utf-8');
     const content = raw.replace(/\n/g, '<br />');
-    res.render('view', { fileName: file.fileName, content });
+    res.render('view', { 
+      fileName: file.fileName, 
+      fullPath: file.fullPath, 
+      content });
   } catch (err) {
     console.error('Error sending file:', err);
     res.status(500).send('Failed to send file.');
