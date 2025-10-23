@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
 import fs from 'fs/promises';
-import { db } from '../sqlite.js'
 
 const router = express.Router();
 const HOST = process.env.HOST
@@ -9,18 +8,11 @@ const PORT = process.env.PORT
 
 router.get('/', async (req, res) => {
   try {
-    const rows = await db.all(`
-      SELECT hash, COUNT(*) AS count,
-             GROUP_CONCAT(filename, ', ') AS filenames
-      FROM files
-      GROUP BY hash
-      HAVING count > 1
-      ORDER BY count DESC
-      LIMIT ${process.env.MAX_LIMIT}
-    `);
+    const response = await fetch(`http://${HOST}:${PORT}/api/v1/duplicates`);
+    const data = await response.json();
 
     res.render('duplicates', {
-      duplicates: rows
+      duplicates: data
     });
   } catch (err) {
     console.error('Database error:', err);
@@ -32,16 +24,11 @@ router.get('/:hash', async (req, res) => {
   const hash = req.params.hash;
 
   try {
-    // const rows = await db.all(`
-    //   SELECT * FROM files
-    //   WHERE hash = ?
-    //   ORDER BY createdAt DESC
-    // `, [hash]);
     const response = await fetch(`http://${HOST}:${PORT}/api/v1/files/hash/${hash}`);
     const data = await response.json();
     
     res.render('inspect', {
-      duplicates: data.rows, 
+      duplicates: data, 
       hash
     });
   } catch (err) {
@@ -55,23 +42,25 @@ router.delete('/:id', async (req, res) => {
   
   try {
     // Fetch the file entry
-    const row = await db.get(`SELECT fullPath FROM files WHERE id = ?`, [id]);
+    const response1 = await fetch(`http://${HOST}:${PORT}/api/v1/files/hash/${hash}?pathonly=true`);
+    const data = await response1.json();
 
-    if (!row) {
-      return res.status(404).json({ error: 'File not found' });
-    }
+    // Abort if disk deletion fails...
+    await fs.unlink(data.fullPath);
+    console.log(`Deleted file from disk: fullPath = ${data.fullPath}`);
 
-    try {
-      // Abort if disk deletion fails...
-      await fs.unlink(row.fullPath);
-      console.log(`Deleted file from disk: fullPath = ${row.fullPath}`);
+    // Delete from database
+    const response2 = await fetch(`/api/v1/files/id/${id}`, {
+      method: 'DELETE'
+    });
 
-      // Delete from database
-      const result = await db.run(`DELETE FROM files WHERE id = ?`, [id]);
-      console.log(`Deleted file from database: id = ${id}, rows affected = ${result.changes}`);
-    } catch (err) {
-      console.warn(`Failed on deletion: fullPath = ${row.fullPath}, id = ${id}`);
-      console.log(err.messsage)      
+    const result = await response2.json();
+
+    if (response.ok) {
+      //console.log('Deleted:', result.deletedId);
+      console.log(`Deleted file from database: id = ${result.deletedId}, rows affected = ${result.changes}`);    
+    } else {
+      console.error('Delete failed:', result.error);
     }
 
     res.status(200).json({ message: `File with id ${id} deleted` });
