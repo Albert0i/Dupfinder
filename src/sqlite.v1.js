@@ -2,14 +2,18 @@
     Promise-based wrapper
 */
 import 'dotenv/config';
-import Database from 'better-sqlite3';
-import * as sqliteVec from 'sqlite-vec';
+import sqlite3 from 'sqlite3';
+import { open } from 'sqlite';
+import * as sqliteVec from "sqlite-vec";
 import path from 'path';
 
 const dbPath = process.env.DB_PATH || path.resolve('./data/db.sq3');
-const db = new Database(dbPath); // synchronous, no await
 
-db.pragma('journal_mode = WAL');
+const db = await open({
+  filename: dbPath,
+  driver: sqlite3.Database
+});
+
 /*
    Use the sqliteVec.load() function to load sqlite-vec SQL functions 
    into a SQLite connection.
@@ -18,10 +22,10 @@ sqliteVec.load(db);
 
 // Show version info
 const { sqlite_version, vec_version } = await db.
-  prepare(
+  get(
     `SELECT sqlite_version() AS sqlite_version, 
             vec_version() AS vec_version;`
-   ).get()
+   )
 console.log(`sqlite_version=${sqlite_version}, vec_version=${vec_version}`);
 
 /*
@@ -76,9 +80,6 @@ Output:
 export { db, dbPath };
 
 /*
-   better-sqlite3
-   https://github.com/WiseLibs/better-sqlite3
-
    SQLite Client for Node.js Apps
    https://www.npmjs.com/package/sqlite
 

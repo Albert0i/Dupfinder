@@ -9,21 +9,21 @@ const router = express.Router();
 // GET /api/v1/dashboard — returns dashboard metrics as JSON
 router.get('/dashboard', async (req, res) => {
     try {
-      const totalRow = await db.get('SELECT COUNT(*) AS totalFiles FROM files');
+      const totalRow = await db.prepare('SELECT COUNT(*) AS totalFiles FROM files').get();
   
-      const dupRow = await db.get(`
+      const dupRow = await db.prepare(`
         SELECT COUNT(*) AS duplicateCount FROM (
           SELECT hash FROM files GROUP BY hash HAVING COUNT(*) > 1
         )
-      `);
+      `).get();
   
-      const scanFolder = await db.get(`
+      const scanFolder = await db.prepare(`
         SELECT auditValue FROM audit WHERE auditKey='scanFolder'
-      `);
+      `).get();
   
-      const scanAt = await db.get(`
+      const scanAt = await db.prepare(`
         SELECT auditValue FROM audit WHERE auditKey='endTime'
-      `);
+      `).get();
   
       res.json({
         totalFiles: totalRow?.totalFiles || 0,
@@ -40,7 +40,7 @@ router.get('/dashboard', async (req, res) => {
 // GET /api/v1/duplicates — returns duplicates metrics as JSON
 router.get('/duplicates', async (req, res) => {
     try {
-        const rows = await db.all(`
+        const rows = await db.prepare(`
             SELECT hash, COUNT(*) AS count,
                    GROUP_CONCAT(filename, ', ') AS filenames
             FROM files
@@ -48,7 +48,7 @@ router.get('/duplicates', async (req, res) => {
             HAVING count > 1
             ORDER BY count DESC
             LIMIT ${process.env.MAX_LIMIT}
-          `);    
+          `).all();
         res.json(rows);
 
       } catch (err) {
@@ -64,20 +64,20 @@ router.get('/files/hash/:hash', async (req, res) => {
     
     try {
         if (pathOnly) {
-            const file = await db.get(`
+            const file = await db.prepare(`
                 SELECT fullPath 
                 FROM files 
                 WHERE hash = ? 
-                LIMIT 1`, [hash]);
+                LIMIT 1`).get(hash);
             
-            res.json(file);  
+            res.json(file);
         } else { 
-            const rows = await db.all(`
+            const rows = await db.prepare(`
                 SELECT * 
                 FROM files 
                 WHERE hash = ? 
-                ORDER BY createdAt DESC`, [hash]);
-        
+                ORDER BY createdAt DESC`).all(hash);
+            
             res.json( rows );
         }
     } catch (err) {
@@ -92,10 +92,10 @@ router.get('/files/id/:id', async (req, res) => {
     const pathOnly = req.query.pathonly === 'true';
     
     try {
-        const file = await db.get(`
+        const file = await db.prepare(`
           SELECT ${pathOnly ? 'fullPath' : '*'} 
           FROM files 
-          WHERE id = ?`, [id]);
+          WHERE id = ?`).get(id);
       
         res.json(file); 
     } catch (err) {
@@ -126,14 +126,14 @@ router.delete('/files/id/:id', async (req, res) => {
 router.get('/info', async (req, res) => {
     try {
       // Fetch audit metadata
-      const auditRows = await db.all(`
+      const auditRows = await db.prepare(`
         SELECT auditKey, auditValue
         FROM audit
         ORDER BY id ASC
-      `);
+      `).all();
 
       // Fetch file statistics
-      const fileStats = await db.all(`
+      const fileStats = await db.prepare(`
         SELECT
           (SELECT COUNT(*) FROM files) AS totalFilesIndexed,
           (SELECT SUM(fileSize) FROM files) AS totalSizeBytes,
@@ -141,17 +141,17 @@ router.get('/info', async (req, res) => {
           (SELECT MAX(indexedAt) FROM files) AS latestIndexedAt,
           (SELECT MIN(createdAt) FROM files) AS earliestCreatedAt,
           (SELECT MAX(modifiedAt) FROM files) AS latestModifiedAt
-      `);
+      `).all();
 
       // Fetch top 10 file formats
-      const topFormats = await db.all(`
+      const topFormats = await db.prepare(`
         SELECT fileFormat, COUNT(*) AS count
         FROM files
         WHERE fileFormat <> ''
         GROUP BY fileFormat
         ORDER BY count DESC
         LIMIT 10
-      `);
+      `).all();
 
       const info = {};
       auditRows.forEach(row => {
@@ -162,9 +162,9 @@ router.get('/info', async (req, res) => {
       info.topFileFormats = topFormats;  // add top 10 formats
 
       // Fetch SQLite and VSS version
-      const versions = await db.get(`
+      const versions = await db.prepare(`
         SELECT sqlite_version() AS sqlite_version, vec_version() AS vec_version
-      `);
+      `).get();
       
       info.sqliteVersion = versions.sqlite_version;
       info.vecVersion = versions.vec_version;

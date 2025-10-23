@@ -145,12 +145,12 @@ export async function writeAudit(db, key, value, flush = true) {
   `;
 
   try {
-    await db.run(sql, [key, value]);
+    await db.prepare(sql).run(key, value);
     console.log(`✅ Audit added: ${key} → ${value}`);
 
+    // Optional: force WAL checkpoint to flush changes to disk
     if (flush) {
-      // Optional: force WAL checkpoint to flush changes to disk
-      await db.run('PRAGMA wal_checkpoint(FULL)');
+      db.exec('PRAGMA wal_checkpoint(FULL)');
       console.log('🧾 WAL checkpoint triggered — data flushed to disk.');
     }
   } catch (err) {

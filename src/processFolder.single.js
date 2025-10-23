@@ -40,34 +40,71 @@ const ROOT_FOLDER = args[0] || 'D:\\';
 console.log(`📂 Scanning folder: ${ROOT_FOLDER}`);
 
 // 🧾 Flush batch into database, handle constraint violations
-async function flushBatch(db, insertStmt, updateStmt) {
-  if (batch.length === 0) return;
+// async function flushBatch(db, insertStmt, updateStmt) {
+//   if (batch.length === 0) return;
   
+//   try {
+//     await db.exec('BEGIN TRANSACTION');
+//     for (const item of batch) {
+//       try {
+//         await insertStmt.run(
+//           item.fileName,
+//           item.fullPath,
+//           item.fileFormat,
+//           item.fileSize,
+//           item.hash,
+//           item.indexedAt, 
+//           item.createdAt,
+//           item.modifiedAt
+//         );
+//         processedCount++;
+//       } catch (err) {
+//         if (err.code === 'SQLITE_CONSTRAINT') {
+//           await updateStmt.run(item.fullPath);
+//           skippedCount++;
+//         } else {
+//           throw err;
+//         }
+//       }
+//     }
+//     await db.exec('COMMIT');
+//     console.log(`📦 Batch flushed: ${batch.length} items`);
+//     batch = [];
+//   } catch (err) {
+//     console.error('⚠️ Error during flushBatch:', err.message);
+//   }
+// }
+function flushBatch(db, insertStmt, updateStmt) {
+  if (batch.length === 0) return;
+
   try {
-    await db.exec('BEGIN TRANSACTION');
-    for (const item of batch) {
-      try {
-        await insertStmt.run(
-          item.fileName,
-          item.fullPath,
-          item.fileFormat,
-          item.fileSize,
-          item.hash,
-          item.indexedAt, 
-          item.createdAt,
-          item.modifiedAt
-        );
-        processedCount++;
-      } catch (err) {
-        if (err.code === 'SQLITE_CONSTRAINT') {
-          await updateStmt.run(item.fullPath);
-          skippedCount++;
-        } else {
-          throw err;
+    const transaction = db.transaction(() => {
+      for (const item of batch) {
+        try {
+          db.prepare(insertStmt).run(
+            item.fileName,
+            item.fullPath,
+            item.fileFormat,
+            item.fileSize,
+            item.hash,
+            item.indexedAt,
+            item.createdAt,
+            item.modifiedAt
+          );
+          processedCount++;
+        } catch (err) {
+          if (err.code === 'SQLITE_CONSTRAINT') {
+            //updateStmt.run(item.fullPath);
+            db.prepare(updateStmt).run(item.fullPath);
+            skippedCount++;
+          } else {
+            throw err;
+          }
         }
       }
-    }
-    await db.exec('COMMIT');
+    });
+
+    transaction(); // execute the transaction
     console.log(`📦 Batch flushed: ${batch.length} items`);
     batch = [];
   } catch (err) {
