@@ -18,7 +18,7 @@ db.pragma('journal_mode = WAL');
 sqliteVec.load(db);
 
 // Show version info
-const { sqlite_version, vec_version } = await db.
+const { sqlite_version, vec_version } = db.
   prepare(
     `SELECT sqlite_version() AS sqlite_version, 
             vec_version() AS vec_version;`
@@ -44,7 +44,7 @@ const items = [
       );
    `);
 
- const insertStmt = await db.prepare(
+ const insertStmt = db.prepare(
    "INSERT INTO vec_items(rowid, embedding) VALUES (?, ?)",
  );
  // TODO node:sqlite doesn't have `.transaction()` support yet
@@ -52,19 +52,18 @@ const items = [
    // node:sqlite requires Uint8Array for BLOB values, so a bit awkward
    insertStmt.run(BigInt(id), new Uint8Array(new Float32Array(vector).buffer));
  }
- 
- const selectStmt = await db.prepare(`
+
+const rows = db
+   .prepare(`
          SELECT rowid, distance
          FROM vec_items
          WHERE embedding MATCH ?
          ORDER BY distance
          LIMIT 3
-      `
-   )
-//const rows = await..all(new Uint8Array(new Float32Array(query).buffer));
-selectStmt.bind(new Uint8Array(new Float32Array(query).buffer))
-const rows = await selectStmt.all()
+      `)
+   .all(new Uint8Array(new Float32Array(query).buffer));
 console.log(rows);
+
 /*
 Output: 
 [
