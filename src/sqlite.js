@@ -37,8 +37,8 @@ const items = [
  ];
  const query = [0.1, 0.2, 0.3, 0.4];
  
- await db.exec(`DROP TABLE vec_items`)
- await db.exec(`
+ db.exec(`DROP TABLE vec_items`)
+ db.exec(`
    CREATE VIRTUAL TABLE vec_items USING vec0 (
          embedding float[4]
       );
@@ -50,7 +50,7 @@ const items = [
  // TODO node:sqlite doesn't have `.transaction()` support yet
  for (const [id, vector] of items) {
    // node:sqlite requires Uint8Array for BLOB values, so a bit awkward
-   await insertStmt.run(BigInt(id), new Uint8Array(new Float32Array(vector).buffer));
+   insertStmt.run(BigInt(id), new Uint8Array(new Float32Array(vector).buffer));
  }
  
  const selectStmt = await db.prepare(`
@@ -62,7 +62,7 @@ const items = [
       `
    )
 //const rows = await..all(new Uint8Array(new Float32Array(query).buffer));
-await selectStmt.bind(new Uint8Array(new Float32Array(query).buffer))
+selectStmt.bind(new Uint8Array(new Float32Array(query).buffer))
 const rows = await selectStmt.all()
 console.log(rows);
 /*
