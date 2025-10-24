@@ -91,7 +91,7 @@ function flushBatch(db, insert, update) {
 }
 
 // 🧬 Process individual file and add to batch
-async function processFile(filePath, db, insertStmt, updateStmt) {
+async function processFile(filePath, db, insert, update) {
   const now = new Date();
 
   try {
@@ -155,10 +155,10 @@ async function main() {
   db.exec(SQL_create_table);
 
   // 🧾 Prepare insert statement 
-  const insert = await db.prepare(SQL_insert);
+  const insert = db.prepare(SQL_insert);
 
   // 🧾 Prepare update statement 
-  const update = await db.prepare(SQL_update);
+  const update = db.prepare(SQL_update);
 
   // Write audit
   writeAudit(db, 'scanFolder', ROOT_FOLDER);
