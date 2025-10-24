@@ -175,7 +175,7 @@ async function main() {
   }
 
   // 🔄 Start processing queued tasks
-  await processQueueLoop(db, insertStmt, updateStmt, queue);
+  await processQueueLoop(db, insert, update, queue);
   // ⏳ Wait for all file tasks to finish
   await Promise.all(processingPromises);
   // 🧺 Ensure final DB flush completes
