@@ -137,18 +137,16 @@ export const SQL_update = `
     UPDATE files SET updateIdent = updateIdent + 1 WHERE fullPath = ?
   `;
 
-
-export async function writeAudit(db, key, value, flush = true) {
+export function writeAudit(db, key, value, flush = true) {
   const sql = `
     INSERT INTO audit (auditKey, auditValue)
     VALUES (?, ?)
   `;
 
   try {
-    await db.prepare(sql).run(key, value);
+    db.prepare(sql).run(key, value);
     console.log(`✅ Audit added: ${key} → ${value}`);
 
-    // Optional: force WAL checkpoint to flush changes to disk
     if (flush) {
       db.exec('PRAGMA wal_checkpoint(FULL)');
       console.log('🧾 WAL checkpoint triggered — data flushed to disk.');

@@ -56,9 +56,9 @@ router.delete('/:id', async (req, res) => {
 
     const result = await response2.json();
 
-    // result = { success: true, result: { stmt: {}, lastID: 5, changes: 1 } }
+    // result = { success: true, changes: 1, lastInsertRowid: 5 }
     if (result.success) {
-      console.log(`Delete file from database: id = ${result.result.lastID}, rows affected = ${result.result.changes}`);
+      console.log(`Delete file from database: id = ${id}, rows affected = ${result.changes}`);
     } else {
       console.error('Delete failed:', result);
     }

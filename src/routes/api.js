@@ -109,13 +109,13 @@ router.delete('/files/id/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
-      const result = await db.run('DELETE FROM files WHERE id = ?', [id]);
+      const result = await db.prepare('DELETE FROM files WHERE id = ?').run(id);
 
       if (result.changes === 0) {
         return res.status(404).json({ error: 'File not found.' });
       }
 
-      res.json({ success: true, result });
+      res.json({ success: true, ...result });
     } catch (err) {
       console.error('API error:', err);
       res.status(500).json({ error: 'Failed to delete file.' });

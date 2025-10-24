@@ -9,6 +9,7 @@ import path from 'path';
 const dbPath = process.env.DB_PATH || path.resolve('./data/db.sq3');
 const db = new Database(dbPath); // synchronous, no await
 
+// Sets the journal mode to WAL, which stands for Write-Ahead Logging. 
 db.pragma('journal_mode = WAL');
 /*
    Use the sqliteVec.load() function to load sqlite-vec SQL functions 

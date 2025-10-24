@@ -74,14 +74,14 @@ console.log(`📂 Scanning folder: ${ROOT_FOLDER}`);
 //     console.error('⚠️ Error during flushBatch:', err.message);
 //   }
 // }
-function flushBatch(db, insertStmt, updateStmt) {
+function flushBatch(db, insert, update) {
   if (batch.length === 0) return;
 
   try {
     const transaction = db.transaction(() => {
       for (const item of batch) {
         try {
-          db.prepare(insertStmt).run(
+          insert.run(
             item.fileName,
             item.fullPath,
             item.fileFormat,
@@ -93,9 +93,9 @@ function flushBatch(db, insertStmt, updateStmt) {
           );
           processedCount++;
         } catch (err) {
+          console.warn('⚠️ Constraint hit for:', item.fullPath);
           if (err.code === 'SQLITE_CONSTRAINT') {
-            //updateStmt.run(item.fullPath);
-            db.prepare(updateStmt).run(item.fullPath);
+            update.run(item.fullPath);
             skippedCount++;
           } else {
             throw err;
@@ -113,7 +113,7 @@ function flushBatch(db, insertStmt, updateStmt) {
 }
 
 // 🧬 Process individual file and add to batch
-async function processFile(filePath, db, insertStmt, updateStmt) {
+async function processFile(filePath, db, insert, update) {
   const now = new Date();
 
   try {
@@ -138,7 +138,7 @@ async function processFile(filePath, db, insertStmt, updateStmt) {
     });
 
     if (batch.length >= BATCH_SIZE) {
-      await flushBatch(db, insertStmt, updateStmt);
+      flushBatch(db, insert, update);
     }
   } catch (err) {
     console.error(`⚠️ Error processing ${filePath}:`, err.message);
@@ -153,10 +153,10 @@ async function main() {
   await db.exec(SQL_create_table);
   
   // 🧾 Prepare insert statement 
-  const insertStmt = await db.prepare(SQL_insert);
+  const insert = db.prepare(SQL_insert);
 
   // 🧾 Prepare update statement 
-  const updateStmt = await db.prepare(SQL_update);
+  const update = db.prepare(SQL_update);
 
   // Write audit
   await writeAudit(db, 'scanFolder', ROOT_FOLDER);
@@ -167,7 +167,7 @@ async function main() {
 
   // Start running here... 
   for await (const filePath of walk(ROOT_FOLDER)) {
-    await processFile(filePath, db, insertStmt, updateStmt);
+    await processFile(filePath, db, insert, update);
   }
   /*
   // JavaScript does this under the hood:
@@ -182,9 +182,9 @@ async function main() {
   */
 
   // 🧺 Flush remaining records to DB
-  await flushBatch(db, insertStmt, updateStmt);   
-  await insertStmt.finalize();    // 🔒 Finalize insert statement
-  await updateStmt.finalize();    // 🔒 Finalize update statement
+  flushBatch(db, insert, update);   
+  //await insertStmt.finalize();    // 🔒 Finalize insert statement
+  //await updateStmt.finalize();    // 🔒 Finalize update statement
 
   // Write audit
   const endTime = new Date(); // ✅ creates a Date object
