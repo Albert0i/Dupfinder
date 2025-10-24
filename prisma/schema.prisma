@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model audit {
+  id          Int    @id @default(autoincrement())
+  auditKey    String @unique(map: "sqlite_autoindex_audit_1")
+  auditValue  String
+  updateIdent Int    @default(0)
+}
+
+model files {
+  id          Int    @id @default(autoincrement())
+  fileName    String
+  fullPath    String @unique(map: "sqlite_autoindex_files_1")
+  fileFormat  String
+  fileSize    Int
+  description String @default("")
+  hash        String
+  indexedAt   String
+  createdAt   String
+  modifiedAt  String
+  updateIdent Int    @default(0)
+}

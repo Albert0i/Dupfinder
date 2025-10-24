@@ -37,42 +37,32 @@ const items = [
  ];
  const query = [0.1, 0.2, 0.3, 0.4];
  
- try {
-   db.exec(`DROP TABLE vec_items`)
- } catch (err) {
-   console.log(err.message)
- }
-
- try {
-   db.exec(`
-      CREATE VIRTUAL TABLE vec_items USING vec0 (
-            embedding float[4]
-         );
-      `);
-
-   const insertStmt = db.prepare(
-      "INSERT INTO vec_items(rowid, embedding) VALUES (?, ?)",
+ db.exec(`DROP TABLE vec_items`)
+ db.exec(`
+   CREATE VIRTUAL TABLE vec_items USING vec0 (
+         embedding float[4]
       );
-      // TODO node:sqlite doesn't have `.transaction()` support yet
-      for (const [id, vector] of items) {
-      // node:sqlite requires Uint8Array for BLOB values, so a bit awkward
-      insertStmt.run(BigInt(id), new Uint8Array(new Float32Array(vector).buffer));
-      }
-   
-   const rows = db
-      .prepare(`
-            SELECT rowid, distance
-            FROM vec_items
-            WHERE embedding MATCH ?
-            ORDER BY distance
-            LIMIT 3
-         `)
-      .all(new Uint8Array(new Float32Array(query).buffer));
-   
-   console.log(rows);      
- } catch (err) {
-   console.log(err.message)
+   `);
+
+ const insertStmt = db.prepare(
+   "INSERT INTO vec_items(rowid, embedding) VALUES (?, ?)",
+ );
+ // TODO node:sqlite doesn't have `.transaction()` support yet
+ for (const [id, vector] of items) {
+   // node:sqlite requires Uint8Array for BLOB values, so a bit awkward
+   insertStmt.run(BigInt(id), new Uint8Array(new Float32Array(vector).buffer));
  }
+
+const rows = db
+   .prepare(`
+         SELECT rowid, distance
+         FROM vec_items
+         WHERE embedding MATCH ?
+         ORDER BY distance
+         LIMIT 3
+      `)
+   .all(new Uint8Array(new Float32Array(query).buffer));
+console.log(rows);
 
 /*
 Output: 
