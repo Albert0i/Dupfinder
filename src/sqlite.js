@@ -80,6 +80,9 @@ export { db, dbPath };
    better-sqlite3
    https://github.com/WiseLibs/better-sqlite3
 
+   Using the better-sqlite3 driver
+   https://www.prisma.io/docs/orm/overview/databases/sqlite
+
    SQLite Client for Node.js Apps
    https://www.npmjs.com/package/sqlite
 

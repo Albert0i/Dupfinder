@@ -55,6 +55,9 @@ console.log(`📂 Scanning folder: ${ROOT_FOLDER}`);
 function flushBatch(db, insert, update) {
   if (batch.length === 0) return;
 
+  // 🔍 Add this line to trace flush timing and batch size
+  console.log(`🌀 Flushing batch of ${batch.length} items`);
+
   try {
     const transaction = db.transaction(() => {
       for (const item of batch) {
