@@ -52,37 +52,37 @@ const ROOT_FOLDER = args[0] || 'D:\\';
 console.log(`📂 Scanning folder: ${ROOT_FOLDER}`);
 
 // 🧾 Flush batch into database, handle constraint violations
-async function flushBatch(db, insertStmt, updateStmt) {
+function flushBatch(db, insert, update) {
   if (batch.length === 0) return;
 
-  // 🔍 Add this line to trace flush timing and batch size
-  console.log(`🌀 Flushing batch of ${batch.length} items`);
-
   try {
-    await db.exec('BEGIN TRANSACTION');
-    for (const item of batch) {
-      try {
-        await insertStmt.run(
-          item.fileName,
-          item.fullPath,
-          item.fileFormat,
-          item.fileSize,
-          item.hash,
-          item.indexedAt, 
-          item.createdAt,
-          item.modifiedAt
-        );
-        processedCount++;
-      } catch (err) {
-        if (err.code === 'SQLITE_CONSTRAINT') {
-          await updateStmt.run(item.fullPath);
-          skippedCount++;
-        } else {
-          throw err;
+    const transaction = db.transaction(() => {
+      for (const item of batch) {
+        try {
+          insert.run(
+            item.fileName,
+            item.fullPath,
+            item.fileFormat,
+            item.fileSize,
+            item.hash,
+            item.indexedAt,
+            item.createdAt,
+            item.modifiedAt
+          );
+          processedCount++;
+        } catch (err) {
+          console.warn('⚠️ Constraint hit for:', item.fullPath);
+          if (err.code === 'SQLITE_CONSTRAINT') {
+            update.run(item.fullPath);
+            skippedCount++;
+          } else {
+            throw err;
+          }
         }
       }
-    }
-    await db.exec('COMMIT');
+    });
+
+    transaction(); // execute the transaction
     console.log(`📦 Batch flushed: ${batch.length} items`);
     batch = [];
   } catch (err) {
@@ -117,9 +117,9 @@ async function processFile(filePath, db, insertStmt, updateStmt) {
     processedPaths.add(filePath);   // Mark file as processed
 
     if (batch.length >= BATCH_SIZE) {
-      flushLock = flushLock.then(() =>            // Chain flush to previous
-        flushBatch(db, insertStmt, updateStmt));  // Flush batch to database
-      await flushLock;                            // Wait for flush to complete
+      flushLock = flushLock.then(() =>    // Chain flush to previous
+        flushBatch(db, insert, update));  // Flush batch to database
+      await flushLock;                    // Wait for flush to complete
     }
   } catch (err) {
     console.error(`⚠️ Error processing ${filePath}:`, err.message);
@@ -152,20 +152,20 @@ async function main() {
   await fs.mkdir('./data', { recursive: true });
   
   // 🧾 Create table if not exists
-  await db.exec(SQL_create_table);
+  db.exec(SQL_create_table);
 
   // 🧾 Prepare insert statement 
-  const insertStmt = await db.prepare(SQL_insert);
+  const insert = await db.prepare(SQL_insert);
 
   // 🧾 Prepare update statement 
-  const updateStmt = await db.prepare(SQL_update);
+  const update = await db.prepare(SQL_update);
 
   // Write audit
-  await writeAudit(db, 'scanFolder', ROOT_FOLDER);
-  await writeAudit(db, 'mode', `concurrent, ${MAX_WORKERS} workers`);
+  writeAudit(db, 'scanFolder', ROOT_FOLDER);
+  writeAudit(db, 'mode', `concurrent, ${MAX_WORKERS} workers`);
   
   const startTime = new Date(); // ✅ creates a Date object
-  await writeAudit(db, 'startTime', startTime.toISOString());
+  writeAudit(db, 'startTime', startTime.toISOString());
 
   // Start running here... 
   for await (const filePath of walk(ROOT_FOLDER)) {
@@ -182,25 +182,23 @@ async function main() {
   await flushLock;
 
   // 🧺 Flush remaining records to DB
-  await flushBatch(db, insertStmt, updateStmt);
-  await insertStmt.finalize();    // 🔒 Finalize insert statement
-  await updateStmt.finalize();    // 🔒 Finalize update statement
-
+  flushBatch(db, insert, update);
+  
   // Write audit
   const endTime = new Date(); // ✅ creates a Date object
   const elapsed = ((endTime - startTime) / 1000).toFixed(2);
   
-  await writeAudit(db, 'endTime', endTime.toISOString());
-  await writeAudit(db, 'elapsedTime', elapsed);
-  await writeAudit(db, 'enqueuedTotal', enqueuedCount);
-  await writeAudit(db, 'filesProcessed', processedCount);
-  await writeAudit(db, 'difference', enqueuedCount - processedCount);
-  await writeAudit(db, 'filesSkipped',  skippedCount);
+  writeAudit(db, 'endTime', endTime.toISOString());
+  writeAudit(db, 'elapsedTime', elapsed);
+  writeAudit(db, 'enqueuedTotal', enqueuedCount);
+  writeAudit(db, 'filesProcessed', processedCount);
+  writeAudit(db, 'difference', enqueuedCount - processedCount);
+  writeAudit(db, 'filesSkipped',  skippedCount);
   // Find paths that were enqueued but not processed
   const missing = [...enqueuedPaths].filter(p => !processedPaths.has(p));
-  await writeAudit(db, 'missingFiles',  missing.length);
+  writeAudit(db, 'missingFiles',  missing.length);
 
-  await db.close();               // 🔚 Close database connection
+  db.close();               // 🔚 Close database connection
 
   // Write all enqueued paths
   await fs.writeFile('./data/enqueued.txt', [...enqueuedPaths].join('\n'));
