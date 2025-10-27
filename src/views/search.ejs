@@ -7,62 +7,64 @@
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <script src="/assets/tailwind.js"></script>  
 </head>
-<body class="bg-gray-100 text-gray-900 flex items-center justify-center"></body>
+<body class="bg-gray-100 text-gray-900 min-h-screen flex items-start justify-center px-4 py-8">
+  <section class="w-full max-w-4xl flex flex-col items-center p-6 bg-white shadow-lg rounded-lg">
 
-  <section class="w-full max-w-4xl flex flex-col justify-between p-6 bg-white shadow-lg rounded-lg">
+    <!-- 🌀 Header -->
+    <header class="text-center mb-4">
+      <h1 class="text-4xl font-bold">
+        🌀 <span class="font-normal">dup</span><span class="font-extrabold text-gray-900">Finder</span>
+      </h1>
+    </header>
 
-      <!-- 🌀 Header -->
-      <header class="text-center mb-4">
-        <h1 class="text-4xl font-bold">
-          🌀 <span class="font-normal">dup</span><span class="font-extrabold text-gray-900">Finder</span>
-        </h1>
-      </header>
+    <!-- 📊 Main -->
+    <main class="w-full">
+      <h1 class="text-xl font-semibold mb-6 text-gray-900 text-center">Search</h1>
 
-      <!-- 📊 Main -->
-      <main class="max-w-4xl py-4 px-4">
-        <h1 class="text-xl font-semibold mb-6 text-gray-900">Search</h1>
-
+      <div class="max-w-md mx-auto">
         <form action="/search" method="POST" class="space-y-4">
           <input type="text" name="stext" placeholder="Enter text..."
-                  class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-400" autoFocus/>
-    
+                 class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-400" autoFocus />
+
           <button type="submit"
                   class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition">
             Search
           </button>
         </form>
-      </main>  
+      </div>
+    </main>
 
-      <section class="max-w-xl mx-auto mt-10 p-6 bg-white shadow rounded">
-        <% if (results && results.length > 0) { %>
-          <div class="mt-6">
-            <h2 class="text-lg font-medium mb-2">Results:</h2>
-            <ul class="space-y-2">
-              <% results.forEach(file => { %>
-                <li class="border p-3 rounded bg-gray-100">
-                  <strong><%= file.filename %></strong><br />
-                  <span class="text-sm text-gray-600"><%= file.fullpath %></span><br />
-                  <span class="text-xs text-gray-500">Created: <%= new Date(file.createdAt).toLocaleString() %></span>
-                </li>
-              <% }) %>
-            </ul>
-          </div>
-        <% } else if (results) { %>
-          <p class="mt-6 text-sm text-red-500">No matching files found.</p>
-        <% } %>
-      </section>
-    
-      <!-- Copilot Credit -->
-      <footer class="m-4 text-center text-sm text-gray-700">
-        <p>
-          Crafted with quiet guidance by 
-          <a href="https://copilot.microsoft.com" target="_blank" class="text-blue-600 font-semibold hover:underline">
-            Microsoft Copilot
-          </a> — <br />your companion in code.
-        </p>
-      </footer>
+    <!-- 📁 Output -->
+    <section class="w-full max-w-xl mt-10 p-6 bg-white shadow rounded">
+      <% if (results && results.length > 0) { %>
+        <div class="mt-6">
+          <h2 class="text-lg font-medium mb-4 text-center">Results:</h2>
+          <ol class="space-y-4 list-decimal list-inside">
+            <% results.forEach(file => { %>
+              <li class="border p-4 rounded bg-gray-100 text-sm text-gray-800">
+                <div><strong>Filename:</strong> <%= file.fileName %></div>
+                <div><strong>Full Path:</strong> <%= file.fullPath %></div>
+                <div><strong>Size:</strong> <%= file.fileSize %> bytes</div>
+                <div><strong>Created At:</strong> <%= new Date(file.createdAt).toLocaleString() %></div>
+              </li>
+            <% }) %>
+          </ol>
+        </div>
+      <% } else if (results) { %>
+        <p class="mt-6 text-sm text-red-500 text-center">No matching files found.</p>
+      <% } %>
+    </section>
+
+    <!-- 🤝 Copilot Credit -->
+    <footer class="mt-8 text-center text-sm text-gray-700">
+      <p>
+        Crafted with quiet guidance by
+        <a href="https://copilot.microsoft.com" target="_blank" class="text-blue-600 font-semibold hover:underline">
+          Microsoft Copilot
+        </a> — <br />your companion in code.
+      </p>
+    </footer>
 
   </section>
-
 </body>
 </html>

@@ -183,7 +183,7 @@ router.get('/search/:stext', async (req, res) => {
   if (!stext || stext.trim() === '') {
     return res.status(400).json({ error: 'Search text cannot be empty.' });
   }
-  console.log('stext =', stext)
+  
   const query = `
     SELECT id, fileName, fullPath, fileSize, createdAt
     FROM files
@@ -195,7 +195,6 @@ router.get('/search/:stext', async (req, res) => {
   try {
     const rows = db.prepare(query).all(searchTerm, process.env.MAX_LIMIT)
 
-    console.log('rows =', rows)
     res.json( rows );
   } catch (err) {
     console.error('API error:', err);
