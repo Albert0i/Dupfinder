@@ -12,3 +12,6 @@ MAX_LIMIT=9999
 
 # Max number of workers in concurrent mode
 MAX_WORKERS=8
+
+# For prisma
+DATABASE_URL='file:../data/db.sq3'
