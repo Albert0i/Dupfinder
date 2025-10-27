@@ -122,7 +122,7 @@ dupFinder offers two primary modes of interaction:
 
 - **Duplicate groups**: View files grouped by identical hash.
 - **Preview support**: See content for text documents.
-- **Deletion of files**: Delete from database and disk file. .
+- **Deletion of files**: Delete from database and disk file. 
 
 The dashboard is built with Express, EJS, and TailwindCSS — designed to be minimal, readable, and ritualized. Each view is a lens into your filesystem’s memory.
 
