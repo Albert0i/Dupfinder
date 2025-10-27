@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import express from 'express';
 import { db } from '../sqlite.js'; // adjust path if needed
 import fs from 'fs';
@@ -9,19 +8,19 @@ const router = express.Router();
 // GET /api/v1/dashboard — returns dashboard metrics as JSON
 router.get('/dashboard', async (req, res) => {
     try {
-      const totalRow = await db.prepare('SELECT COUNT(*) AS totalFiles FROM files').get();
+      const totalRow = db.prepare('SELECT COUNT(*) AS totalFiles FROM files').get();
   
-      const dupRow = await db.prepare(`
+      const dupRow = db.prepare(`
         SELECT COUNT(*) AS duplicateCount FROM (
           SELECT hash FROM files GROUP BY hash HAVING COUNT(*) > 1
         )
       `).get();
   
-      const scanFolder = await db.prepare(`
+      const scanFolder = db.prepare(`
         SELECT auditValue FROM audit WHERE auditKey='scanFolder'
       `).get();
   
-      const scanAt = await db.prepare(`
+      const scanAt = db.prepare(`
         SELECT auditValue FROM audit WHERE auditKey='endTime'
       `).get();
   
@@ -40,7 +39,7 @@ router.get('/dashboard', async (req, res) => {
 // GET /api/v1/duplicates — returns duplicates metrics as JSON
 router.get('/duplicates', async (req, res) => {
     try {
-        const rows = await db.prepare(`
+        const rows = db.prepare(`
             SELECT hash, COUNT(*) AS count,
                    GROUP_CONCAT(filename, ', ') AS filenames
             FROM files
@@ -64,7 +63,7 @@ router.get('/files/hash/:hash', async (req, res) => {
     
     try {
         if (pathOnly) {
-            const file = await db.prepare(`
+            const file = db.prepare(`
                 SELECT fullPath 
                 FROM files 
                 WHERE hash = ? 
@@ -72,7 +71,7 @@ router.get('/files/hash/:hash', async (req, res) => {
             
             res.json(file);
         } else { 
-            const rows = await db.prepare(`
+            const rows = db.prepare(`
                 SELECT * 
                 FROM files 
                 WHERE hash = ? 
@@ -92,7 +91,7 @@ router.get('/files/id/:id', async (req, res) => {
     const pathOnly = req.query.pathonly === 'true';
     
     try {
-        const file = await db.prepare(`
+        const file = db.prepare(`
           SELECT ${pathOnly ? 'fullPath' : '*'} 
           FROM files 
           WHERE id = ?`).get(id);
@@ -109,7 +108,7 @@ router.delete('/files/id/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
-      const result = await db.prepare('DELETE FROM files WHERE id = ?').run(id);
+      const result = db.prepare('DELETE FROM files WHERE id = ?').run(id);
 
       if (result.changes === 0) {
         return res.status(404).json({ error: 'File not found.' });
@@ -126,14 +125,14 @@ router.delete('/files/id/:id', async (req, res) => {
 router.get('/info', async (req, res) => {
     try {
       // Fetch audit metadata
-      const auditRows = await db.prepare(`
+      const auditRows = db.prepare(`
         SELECT auditKey, auditValue
         FROM audit
         ORDER BY id ASC
       `).all();
 
       // Fetch file statistics
-      const fileStats = await db.prepare(`
+      const fileStats = db.prepare(`
         SELECT
           (SELECT COUNT(*) FROM files) AS totalFilesIndexed,
           (SELECT SUM(fileSize) FROM files) AS totalSizeBytes,
@@ -144,7 +143,7 @@ router.get('/info', async (req, res) => {
       `).all();
 
       // Fetch top 10 file formats
-      const topFormats = await db.prepare(`
+      const topFormats = db.prepare(`
         SELECT fileFormat, COUNT(*) AS count
         FROM files
         WHERE fileFormat <> ''
@@ -162,7 +161,7 @@ router.get('/info', async (req, res) => {
       info.topFileFormats = topFormats;  // add top 10 formats
 
       // Fetch SQLite and VSS version
-      const versions = await db.prepare(`
+      const versions = db.prepare(`
         SELECT sqlite_version() AS sqlite_version, vec_version() AS vec_version
       `).get();
       
@@ -176,6 +175,33 @@ router.get('/info', async (req, res) => {
       res.status(500).render('error', { message: 'Failed to load scan info.' });
     }
   });
+
+// GET /api/v1/search — returns info metrics as JSON
+router.get('/search/:stext', async (req, res) => {
+  const { stext } = req.params;
+
+  if (!stext || stext.trim() === '') {
+    return res.status(400).json({ error: 'Search text cannot be empty.' });
+  }
+  console.log('stext =', stext)
+  const query = `
+    SELECT id, fileName, fullPath, fileSize, createdAt
+    FROM files
+    WHERE filename LIKE ?
+    LIMIT ?;
+  `;
+  const searchTerm = `%${stext}%`;
+
+  try {
+    const rows = db.prepare(query).all(searchTerm, process.env.MAX_LIMIT)
+
+    console.log('rows =', rows)
+    res.json( rows );
+  } catch (err) {
+    console.error('API error:', err);
+    res.status(500).json({ error: 'Failed to read database.' });
+  }
+});
 
 function getDatabaseSize(dbPath) {
   try {

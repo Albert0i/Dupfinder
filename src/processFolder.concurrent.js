@@ -1,7 +1,6 @@
 /*
    processFolder.concurrent.js 
 */
-import 'dotenv/config';
 import fs from 'fs/promises';
 import path from 'path';
 import { db } from './sqlite.js'
@@ -19,7 +18,6 @@ const enqueuedPaths = new Set();    // Paths queued for processing
 let batch = [];                     // Pending records
 let processedCount = 0;             // Files processed
 let skippedCount = 0;               // Files skipped
-const startTime = Date.now();       // Scan start time
 
 const processingPromises = [];      // Active file processing tasks
 const processedPaths = new Set();   // Paths already processed
@@ -166,6 +164,7 @@ async function main() {
   // Write audit
   writeAudit(db, 'scanFolder', ROOT_FOLDER);
   writeAudit(db, 'mode', `concurrent, ${MAX_WORKERS} workers`);
+  writeAudit(db, 'batchSize', BATCH_SIZE);
   
   const startTime = new Date(); // ✅ creates a Date object
   writeAudit(db, 'startTime', startTime.toISOString());

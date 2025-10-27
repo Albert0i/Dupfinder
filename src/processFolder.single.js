@@ -1,13 +1,12 @@
 /*
    processFolder.single.js 
 */
-import 'dotenv/config';
 import fs from 'fs/promises';
 import path from 'path';
 import { db } from './sqlite.js'
 import { hashFile, walk, SQL_create_table, SQL_insert, SQL_update, writeAudit } from './utils.js'
 
-const BATCH_SIZE = process.env.BATCH_SIZE || 1000;
+const BATCH_SIZE = process.env.BATCH_SIZE || 100;
 
 let batch = [];                     // Pending records
 let processedCount = 0;             // Files processed
@@ -127,6 +126,7 @@ async function main() {
   // Write audit
   writeAudit(db, 'scanFolder', ROOT_FOLDER);
   writeAudit(db, 'mode', 'single');
+  writeAudit(db, 'batchSize', BATCH_SIZE);
   
   const startTime = new Date(); // ✅ creates a Date object
   writeAudit(db, 'startTime', startTime.toISOString());

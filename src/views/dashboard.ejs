@@ -9,7 +9,7 @@
 </head>
 <body class="bg-gray-100 text-gray-900 h-screen flex items-center justify-center">
 
-  <section class="w-full max-w-4xl h-[90vh] flex flex-col justify-between p-6 bg-white shadow-lg rounded-lg">
+  <section class="w-full max-w-4xl h-[100vh] flex flex-col justify-between p-6 bg-white shadow-lg rounded-lg">
 
     <!-- 🌀 Header -->
     <header id="reloadHeader" class="text-center mb-4 hover:cursor-pointer" title="Click to refresh">
@@ -49,6 +49,7 @@
           <code class="bg-gray-100 px-2 py-1 rounded text-sm">
             <%= (scanFolder ? scanFolder.replace('\\\\', '\\').replace('//', '/') : '---') %>
           </code>
+          <!-- Info Icon -->
           <a href="/info" target="_blank"
              class="text-blue-600 hover:text-blue-800 transition"
              title="system information">
@@ -58,6 +59,17 @@
                     d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" />
             </svg>
           </a>
+
+          <!-- Spyglass Icon -->
+          <a href="/search" target="_blank"
+              class="text-blue-600 hover:text-blue-800 transition"
+              title="Search duplicates">
+            <svg xmlns="http://www.w3.org/2000/svg" class="pt-1 h-5 w-4" fill="currentColor"
+                  viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M12.9 14.32a8 8 0 111.414-1.414l4.387 4.387a1 1 0 01-1.414 1.414l-4.387-4.387zM14 8a6 6 0 11-12 0 6 6 0 0112 0z" clip-rule="evenodd" />
+            </svg>
+          </a>
+
         </p>
 
         <p class="mt-1">
