@@ -116,6 +116,8 @@ dupFinder offers two primary modes of interaction:
 
 ![alt inspect](img/inspect.JPG)
 
+![alt info](img/info.JPG)
+
 **dupFinder Features**:
 
 - **Duplicate groups**: View files grouped by identical hash.
