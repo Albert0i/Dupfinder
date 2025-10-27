@@ -6,6 +6,32 @@
   <title>dupFinder Search</title>
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <script src="/assets/tailwind.js"></script>  
+  <script type="text/javascript">
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        console.log(`'${text}' copied to clipboard!`);
+      }).catch(err => {
+        console.error(`'${text}' clipboard copy failed:`, err);
+        alert(`'${text}' clipboard copy failed:`, err);
+      });
+    }
+    </script>
+    <% function formatBytes(bytes) {
+      if (bytes === 0 || bytes == null) return '0 B';
+      const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(1024));
+      const value = bytes / Math.pow(1024, i);
+      return `${value.toFixed(2)} ${units[i]}`;
+    } 
+    
+    function formatTime(seconds) {
+      const hrs = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
+      const secs = (seconds % 60).toFixed(2);
+    
+      return `${hrs}h : ${mins}m : ${secs}s`;
+    }  
+    %>
 </head>
 <body class="bg-gray-100 text-gray-900 min-h-screen flex items-start justify-center px-4 py-8">
   <section class="w-full max-w-4xl flex flex-col items-center p-6 bg-white shadow-lg rounded-lg">
@@ -23,8 +49,8 @@
 
       <div class="max-w-md mx-auto">
         <form action="/search" method="POST" class="space-y-4">
-          <input type="text" name="stext" placeholder="Enter text..."
-                 class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-400" autoFocus />
+          <input type="text" name="stext" placeholder="Enter text..." value="<%= stext%>"
+                 class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-400" autoFocus required/>
 
           <button type="submit"
                   class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition">
@@ -35,16 +61,22 @@
     </main>
 
     <!-- 📁 Output -->
-    <section class="w-full max-w-xl mt-10 p-6 bg-white shadow rounded">
+    <section class="w-full max-w-6xl mt-10 p-6 bg-white shadow rounded">
       <% if (results && results.length > 0) { %>
         <div class="mt-6">
-          <h2 class="text-lg font-medium mb-4 text-center">Results:</h2>
+          <h2 class="text-lg font-medium mb-4 text-center">Results (<%= results.length %>)</h2>
           <ol class="space-y-4 list-decimal list-inside">
             <% results.forEach(file => { %>
               <li class="border p-4 rounded bg-gray-100 text-sm text-gray-800">
                 <div><strong>Filename:</strong> <%= file.fileName %></div>
-                <div><strong>Full Path:</strong> <%= file.fullPath %></div>
-                <div><strong>Size:</strong> <%= file.fileSize %> bytes</div>
+                <div>
+                  <strong>Full Path:</strong>
+                  <span class="cursor-pointer text-blue-600 hover:underline" onclick="copyToClipboard('<%= file.fullPath.replace(/\\/g, '\\\\') %>')">
+
+                    <%= file.fullPath %>
+                  </span>
+                </div>
+                <div><strong>Size:</strong> <%= formatBytes(file.fileSize) %> bytes</div>
                 <div><strong>Created At:</strong> <%= new Date(file.createdAt).toLocaleString() %></div>
               </li>
             <% }) %>
@@ -54,6 +86,13 @@
         <p class="mt-6 text-sm text-red-500 text-center">No matching files found.</p>
       <% } %>
     </section>
+
+    <div class="flex justify-center items-center h-12">
+      <button onclick="window.close()"
+              class="inline-block mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition cursor-pointer">
+        Close
+      </button>
+    </div>
 
     <!-- 🤝 Copilot Credit -->
     <footer class="mt-8 text-center text-sm text-gray-700">
