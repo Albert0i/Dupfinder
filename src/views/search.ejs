@@ -38,7 +38,9 @@
 
     <!-- 🌀 Header -->
     <header class="text-center mb-4">
-      <h1 class="text-4xl font-bold">
+      <h1 class="text-4xl font-bold cursor-pointer inline-block"
+          onclick="location.reload()"
+          title="Click to refresh">
         🌀 <span class="font-normal">dup</span><span class="font-extrabold text-gray-900">Finder</span>
       </h1>
     </header>
@@ -49,13 +51,41 @@
 
       <div class="max-w-md mx-auto">
         <form action="/search" method="POST" class="space-y-4">
-          <input type="text" name="stext" placeholder="Enter text..." value="<%= stext%>"
+          <!-- 🔍 Search Input -->
+          <input type="text" name="stext" placeholder="Enter text to search or * for all..." value="<%= stext%>"
                  class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-400" autoFocus required/>
 
-          <button type="submit"
+          <!-- 📁 File Format Dropdown -->
+          <div class="flex items-center space-x-4">
+            <select name="selectedFormat"
+            class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-400 bg-white text-gray-700">
+            <% fileFormats.forEach(format => { %>
+              <option value="<%= format.fileFormat %>" <%= format.fileFormat === selectedFormat ? 'selected' : '' %>>
+                <%= format.fileFormat %>
+              </option>
+              <% }) %>
+            </select>
+            <p>(<%= fileFormats.length %>)</p>
+          </div>
+          
+          <!-- <button type="submit"
                   class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition">
             Search
-          </button>
+          </button> -->
+          <div class="flex items-center space-x-4">
+            <!-- 🔘 Search Button (full width) -->
+            <button type="submit"
+                    class="flex-1 bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition">
+              Search
+            </button>
+          
+            <!-- 🧹 Reset Button (smaller width) -->
+            <button type="reset"                    
+                    class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition">
+              Reset
+            </button>
+          </div>
+
         </form>
       </div>
     </main>

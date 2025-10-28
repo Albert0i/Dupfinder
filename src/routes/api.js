@@ -176,24 +176,26 @@ router.get('/info', async (req, res) => {
     }
   });
 
-// GET /api/v1/search — returns info metrics as JSON
-router.get('/search/:stext', async (req, res) => {
+// GET /api/v1/search/:stest?format=xxx — returns info metrics as JSON
+router.get('/files/search/:stext', async (req, res) => {
   const { stext } = req.params;
-
+  const selectedFormat = req.query.format;
+  
   if (!stext || stext.trim() === '') {
     return res.status(400).json({ error: 'Search text cannot be empty.' });
   }
-  
+
+  const cond1 = stext === '*' ? '1 = 1' : `LOWER(fileName) LIKE '%${stext.trim().toLowerCase()}%'`
+  const cond2 = selectedFormat === '*ALL*' ? '' : ` AND fileFormat = '${selectedFormat}'`  
   const query = `
     SELECT id, fileName, fullPath, fileSize, createdAt
     FROM files
-    WHERE filename LIKE ?
-    LIMIT ?;
+    WHERE ${cond1} ${cond2}
+    LIMIT ${process.env.MAX_LIMIT};
   `;
-  const searchTerm = `%${stext}%`;
 
   try {
-    const rows = db.prepare(query).all(searchTerm, process.env.MAX_LIMIT)
+    const rows = db.prepare(query).all()
 
     res.json( rows );
   } catch (err) {
@@ -201,6 +203,28 @@ router.get('/search/:stext', async (req, res) => {
     res.status(500).json({ error: 'Failed to read database.' });
   }
 });
+
+// GET /api/v1/fileformats — returns all fileFormat in files
+router.get('/files/formats', async (req, res) => {  
+  const query = `
+    SELECT distinct fileFormat
+    FROM files
+    WHERE fileFormat <> '' AND 
+          CAST(CAST(fileFormat AS INTEGER) AS TEXT) <> fileFormat AND 
+          LOWER(fileFormat) NOT LIKE '%tmp%' AND 
+          LOWER(fileFormat) NOT LIKE '%rfc%'  
+    ORDER BY fileFormat;
+  `;
+  try {
+    const formats = db.prepare(query).all()
+
+    res.json( formats );
+  } catch (err) {
+    console.error('API error:', err);
+    res.status(500).json({ error: 'Failed to read database.' });
+  }
+});
+
 
 function getDatabaseSize(dbPath) {
   try {
