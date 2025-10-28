@@ -95,7 +95,7 @@
       <% if (results && results.length > 0) { %>
         <div class="mt-6">
           <h2 class="text-lg font-medium mb-4 text-center">Results (<%= results.length %>)</h2>
-          <ol class="space-y-4 list-decimal list-inside">
+          <!-- <ol class="space-y-4 list-decimal list-inside">
             <% results.forEach(file => { %>
               <li class="border p-4 rounded bg-gray-100 text-sm text-gray-800">
                 <div><strong>Filename:</strong> <%= file.fileName %></div>
@@ -110,7 +110,37 @@
                 <div><strong>Created At:</strong> <%= new Date(file.createdAt).toLocaleString() %></div>
               </li>
             <% }) %>
+          </ol> -->
+
+          <ol class="space-y-4 list-decimal list-inside">
+            <% results.forEach(file => { %>
+              <li class="border p-4 rounded bg-gray-100 text-sm text-gray-800">
+                <div class="flex justify-between items-center">
+
+                  <!-- 📄 File Info -->
+                  <div class="space-y-1">
+                    <div><strong>Filename:</strong> <%= file.fileName %></div>
+                    <div>
+                      <strong>Full Path:</strong>
+                      <span class="cursor-pointer text-blue-600 hover:underline"
+                            onclick="copyToClipboard('<%= file.fullPath.replace(/\\/g, '\\\\') %>')">
+                        <%= file.fullPath %>
+                      </span>
+                    </div>
+                    <div><strong>Size:</strong> <%= formatBytes(file.fileSize) %> bytes</div>
+                    <div><strong>Created At:</strong> <%= new Date(file.createdAt).toLocaleString() %></div>
+                  </div>
+          
+                  <!-- 👁️ View Button -->
+                  <a href="/view/<%= file.id %>" target="_blank" 
+                     class="ml-4 w-28 h-8 flex items-center justify-center bg-cyan-600 text-white text-sm font-semibold rounded hover:bg-cyan-700 transition text-center whitespace-nowrap shrink-0">
+                    View Text
+                  </a>
+                </div>
+              </li>
+            <% }) %>
           </ol>
+
         </div>
       <% } else if (results) { %>
         <p class="mt-6 text-sm text-red-500 text-center">No matching files found.</p>

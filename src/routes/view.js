@@ -6,13 +6,20 @@ const HOST = process.env.HOST
 const PORT = process.env.PORT
 
 // GET /view/:hash
+// GET /view/:id
 router.get('/:hash', async (req, res) => {
   const { hash } = req.params;
 
   try {
-    const response = await fetch(`http://${HOST}:${PORT}/api/v1/files/hash/${hash}?pathonly=true`);
-    const data = await response.json();
-    
+    let response = null; 
+
+    if (isNumericOnly(hash)) {
+      response = await fetch(`http://${HOST}:${PORT}/api/v1/files/id/${hash}?pathonly=true`);
+    } else {
+      response = await fetch(`http://${HOST}:${PORT}/api/v1/files/hash/${hash}?pathonly=true`);
+    }
+    const data = await response.json();  
+
     if (response.status !== 200) {
       return res.status(response.status).send(data.error || 'Error loading file.');
     }
@@ -32,5 +39,9 @@ router.get('/:hash', async (req, res) => {
     res.status(500).send('Failed to render file.');
   }
 });
+
+function isNumericOnly(value) {
+  return /^\d+$/.test(value);
+}
 
 export default router;
