@@ -176,12 +176,12 @@ router.get('/info', async (req, res) => {
     }
   });
 
-// GET /api/v1/search/:stest?format=xxx — returns info metrics as JSON
+// GET /api/v1/search/:stest?format=xxx&content=false — returns info metrics as JSON
 router.get('/files/search/:stext', async (req, res) => {
   const { stext } = req.params;
-  const selectedFormat = req.query.format;
-  const textContent = req.query.content;
-  
+  const selectedFormat = req.query.format; 
+  const textContent = String(req.query.content).toLowerCase() === 'true';
+
   if (!stext || stext.trim() === '') {
     return res.status(400).json({ error: 'Search text cannot be empty.' });
   }
@@ -206,10 +206,9 @@ router.get('/files/search/:stext', async (req, res) => {
       AND f.isTextFile = 1
     LIMIT ${process.env.MAX_LIMIT};
   `
-
   try {
     const rows = db.prepare(textContent ? query2 : query1).all()
-
+    console.log('query2 = ', query2)
     res.json( rows );
   } catch (err) {
     console.error('API error:', err);
