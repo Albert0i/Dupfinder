@@ -49,6 +49,9 @@ router.post('/', async (req, res) => {
     console.error('Search error:', err.message);
     res.render('search', {
       stext, 
+      fileFormats: await getFormats(),
+      selectedFormat, 
+      textContent,
       results: [],
       error: 'An error occurred while searching.'
     });

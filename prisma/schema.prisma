@@ -21,7 +21,8 @@ model files {
   fullPath    String @unique(map: "sqlite_autoindex_files_1")
   fileFormat  String
   fileSize    Int
-  description String @default("")
+  isTextFile  Int    @default(0)
+  content     String @default("")
   hash        String
   indexedAt   String
   createdAt   String

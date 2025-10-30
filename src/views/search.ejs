@@ -171,11 +171,12 @@
                     <div><strong>Created At:</strong> <%= new Date(file.createdAt).toLocaleString() %></div>
                   </div>
           
-                  <!-- 👁️ View Button -->
-                  <a href="/view/<%= file.id %>" target="_blank" 
-                     class="ml-4 w-28 h-8 flex items-center justify-center bg-cyan-600 text-white text-sm font-semibold rounded hover:bg-cyan-700 transition text-center whitespace-nowrap shrink-0">
-                    View Text
-                  </a>
+                  <!-- 👁️ View Button -->                  
+                    <a href="/view/<%= file.id %>/#:~:text=<%= stext %>" target="_blank" 
+                        class="ml-4 w-28 h-8 flex items-center justify-center bg-cyan-600 text-white text-sm font-semibold rounded hover:bg-cyan-700 transition text-center whitespace-nowrap shrink-0">
+                      View Text
+                    </a>                    
+                  
                 </div>
               </li>
             <% }) %>
