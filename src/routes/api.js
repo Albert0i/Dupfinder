@@ -180,11 +180,13 @@ router.get('/info', async (req, res) => {
 router.get('/files/search/:stext', async (req, res) => {
   const { stext } = req.params;
   const selectedFormat = req.query.format;
+  const textContent = req.query.content;
   
   if (!stext || stext.trim() === '') {
     return res.status(400).json({ error: 'Search text cannot be empty.' });
   }
 
+  console.log('textContent =', textContent)
   const cond1 = stext === '*' ? '1 = 1' : `LOWER(fileName) LIKE '%${stext.trim().toLowerCase()}%'`
   const cond2 = selectedFormat === '*ALL*' ? '' : ` AND fileFormat = '${selectedFormat}'`  
   const query = `

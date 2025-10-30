@@ -11,6 +11,7 @@ router.get('/', async (req, res) => {
     stext: '', 
     fileFormats, 
     selectedFormat: '*ALL*', 
+    textContent : null, 
     results: null, 
     error: null 
   });
@@ -18,6 +19,7 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   const { stext, selectedFormat } = req.body;
+  const textContent = req.body.textContent === 'on';
   const fileFormats = await getFormats()
 
   if (!stext || stext.trim() === '') {
@@ -25,19 +27,21 @@ router.post('/', async (req, res) => {
       stext, 
       fileFormats,
       selectedFormat, 
+      textContent,
       results: [],
       error: 'Search text cannot be empty.'
     });
   }
 
   try {
-    const response = await fetch(`http://${HOST}:${PORT}/api/v1/files/search/${encodeURIComponent(stext.trim())}?format=${selectedFormat}`);
+    const response = await fetch(`http://${HOST}:${PORT}/api/v1/files/search/${encodeURIComponent(stext.trim())}?format=${selectedFormat}&content=${textContent}`);
     const results = await response.json();
 
     res.render('search', {
       stext, 
       fileFormats: await getFormats(),
       selectedFormat, 
+      textContent,
       results,
       error: results.length === 0 ? 'No matching files found.' : null
     });

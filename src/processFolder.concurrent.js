@@ -4,7 +4,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { db } from './sqlite.js'
-import { hashFile, walk, SQL_create_table, SQL_insert, SQL_update, writeAudit } from './utils.js'
+import { analyzeFile, hashFile, walk, SQL_create_table, SQL_insert, SQL_update, writeAudit } from './utils.js'
 
 const BATCH_SIZE = process.env.BATCH_SIZE || 1000;
 // Optimal configuration: MAX_WORKERS = 8
@@ -65,6 +65,7 @@ function flushBatch(db, insert, update) {
             item.fullPath,
             item.fileFormat,
             item.fileSize,
+            item.isTextFile ? 1 : 0, 
             item.hash,
             item.indexedAt,
             item.createdAt,
@@ -97,7 +98,8 @@ async function processFile(filePath, db, insert, update) {
 
   try {
     const stat = await fs.stat(filePath);
-    const hash = await hashFile(filePath);
+    //const hash = await hashFile(filePath);
+    const { hash, isTextFile } = await analyzeFile(filePath)
     const fileName = path.basename(filePath);
     const fileFormat = path.extname(filePath).slice(1).toLowerCase();
     const fileSize = stat.size;
@@ -105,11 +107,15 @@ async function processFile(filePath, db, insert, update) {
     const createdAt = stat.birthtime.toISOString();
     const modifiedAt = stat.mtime.toISOString();
 
+    if (!hash) {
+      console.warn(`⚠️ Warning ${filePath} — hash is null`);
+    }
     batch.push({
       fileName,
       fullPath: filePath,
       fileFormat,
       fileSize,
+      isTextFile, 
       hash,
       indexedAt, 
       createdAt,
