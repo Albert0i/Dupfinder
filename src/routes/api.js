@@ -208,6 +208,7 @@ router.get('/files/search/:stext', async (req, res) => {
   `
   try {
     const rows = db.prepare(textContent ? query2 : query1).all()
+    console.log('query1 = ', query1)
     console.log('query2 = ', query2)
     res.json( rows );
   } catch (err) {
