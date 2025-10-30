@@ -4,7 +4,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { db } from './sqlite.js'
-import { analyzeFile, hashFile, walk, SQL_create_table, SQL_insert, SQL_update, writeAudit } from './utils.js'
+import { analyzeFile, hashFile, walk, SQL_create_table, SQL_insert, SQL_update, SQL_create_table_fs, writeAudit } from './utils.js'
 
 const BATCH_SIZE = process.env.BATCH_SIZE || 100;
 
@@ -122,7 +122,7 @@ async function processFile(filePath, db, insert, update) {
 async function main() {
   await fs.mkdir('./data', { recursive: true });
 
-  // 🧾 Create table if not exists
+  // 🧾 Create tables
   db.exec(SQL_create_table);
   
   // 🧾 Prepare insert statement 
@@ -167,6 +167,9 @@ async function main() {
   writeAudit(db, 'filesProcessed', processedCount);
   writeAudit(db, 'filesSkipped',  skippedCount);
 
+  // 🧾 Create tables for full text search
+  db.exec(SQL_create_table_fs);
+
   db.close();               // 🔚 Close database connection
   
   // 🧮 Final report
@@ -174,6 +177,8 @@ async function main() {
   console.log(`⏱️ Elapsed time: ${elapsed} seconds`);
   console.log(`📁 Files processed: ${processedCount}`);
   console.log(`⚠️ Files skipped (constraint violation): ${skippedCount}`);
+
+
 
   process.exit(0);  // ✅ Exit script successfully
 }

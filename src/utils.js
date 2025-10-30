@@ -196,7 +196,8 @@ export const ignoreExtensions = [
 
 // All used SQLs
 export const SQL_create_table = `
-    CREATE TABLE IF NOT EXISTS files (
+    DROP TABLE IF EXISTS files;
+    CREATE TABLE files (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       fileName VARCHAR(255) NOT NULL,
       fullPath VARCHAR(255) NOT NULL,
@@ -211,17 +212,15 @@ export const SQL_create_table = `
       updateIdent INTEGER NOT NULL DEFAULT 0,
       UNIQUE(fullPath)
     );
-    CREATE TABLE IF NOT EXISTS audit (
+
+    DROP TABLE IF EXISTS audit;
+    CREATE TABLE audit (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       auditKey   VARCHAR(128) NOT NULL,
       auditValue VARCHAR(128) NOT NULL,
       updateIdent INTEGER NOT NULL DEFAULT 0,
       UNIQUE(auditKey)
     );
-    DELETE FROM files; 
-    DELETE FROM sqlite_sequence WHERE name='files';
-    DELETE FROM audit; 
-    DELETE FROM sqlite_sequence WHERE name='audit';
     VACUUM;
   `;
 
@@ -235,6 +234,35 @@ export const SQL_insert = `
 export const SQL_update = `
     UPDATE files SET updateIdent = updateIdent + 1 WHERE fullPath = ?
   `;
+
+export const SQL_create_table_fs = `
+    DROP TABLE IF EXISTS files_fts;
+    CREATE VIRTUAL TABLE files_fts USING fts5(
+      content,
+      content='files',
+      content_rowid='id'
+    );
+
+    INSERT INTO files_fts(rowid, content)
+    SELECT id, content FROM files WHERE isTextFile = 1;
+
+    CREATE TRIGGER files_ai AFTER INSERT ON files
+    WHEN new.isTextFile = 1
+    BEGIN
+      INSERT INTO files_fts(rowid, content) VALUES (new.id, new.content);
+    END;
+
+    CREATE TRIGGER files_au AFTER UPDATE ON files
+    WHEN new.isTextFile = 1
+    BEGIN
+      UPDATE files_fts SET content = new.content WHERE rowid = new.id;
+    END;
+
+    CREATE TRIGGER files_ad AFTER DELETE ON files
+    BEGIN
+      DELETE FROM files_fts WHERE rowid = old.id;
+    END;
+`
 
 export function writeAudit(db, key, value, flush = true) {
   const sql = `

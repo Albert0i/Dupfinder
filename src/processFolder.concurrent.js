@@ -4,7 +4,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { db } from './sqlite.js'
-import { analyzeFile, hashFile, walk, SQL_create_table, SQL_insert, SQL_update, writeAudit } from './utils.js'
+import { analyzeFile, hashFile, walk, SQL_create_table, SQL_insert, SQL_update, SQL_create_table_fs, writeAudit } from './utils.js'
 
 const BATCH_SIZE = process.env.BATCH_SIZE || 1000;
 // Optimal configuration: MAX_WORKERS = 8
@@ -160,7 +160,7 @@ async function processQueueLoop(db, insertStmt, updateStmt, queue) {
 async function main() {
   await fs.mkdir('./data', { recursive: true });
   
-  // 🧾 Create table if not exists
+  // 🧾 Create tables
   db.exec(SQL_create_table);
 
   // 🧾 Prepare insert statement 
@@ -207,6 +207,9 @@ async function main() {
   // Find paths that were enqueued but not processed
   const missing = [...enqueuedPaths].filter(p => !processedPaths.has(p));
   writeAudit(db, 'missingFiles',  missing.length);
+
+  // 🧾 Create tables for full text search
+  db.exec(SQL_create_table_fs);
 
   db.close();               // 🔚 Close database connection
 

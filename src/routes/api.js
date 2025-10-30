@@ -185,19 +185,30 @@ router.get('/files/search/:stext', async (req, res) => {
   if (!stext || stext.trim() === '') {
     return res.status(400).json({ error: 'Search text cannot be empty.' });
   }
-
-  console.log('textContent =', textContent)
+  // fileName
   const cond1 = stext === '*' ? '1 = 1' : `LOWER(fileName) LIKE '%${stext.trim().toLowerCase()}%'`
-  const cond2 = selectedFormat === '*ALL*' ? '' : ` AND fileFormat = '${selectedFormat}'`  
-  const query = `
+  // fileFormat 
+  const cond2 = selectedFormat === '*ALL*' ? '' : ` AND fileFormat = '${selectedFormat}'`
+  // fileName search 
+  const query1 = `
     SELECT id, fileName, fullPath, fileSize, createdAt
     FROM files
     WHERE ${cond1} ${cond2}
     LIMIT ${process.env.MAX_LIMIT};
   `;
 
+  // full text search on file content
+  const query2 = `
+    SELECT f.id, f.fileName, f.fullPath, f.fileSize, f.createdAt
+    FROM files_fts AS fts
+    JOIN files AS f ON fts.rowid = f.id
+    WHERE fts.content MATCH '${stext.trim()}'
+      AND f.isTextFile = 1
+    LIMIT ${process.env.MAX_LIMIT};
+  `
+
   try {
-    const rows = db.prepare(query).all()
+    const rows = db.prepare(textContent ? query2 : query1).all()
 
     res.json( rows );
   } catch (err) {
@@ -242,3 +253,11 @@ function getDatabaseSize(dbPath) {
 }
 
 export default router;
+
+/*
+  SELECT f.id, fileName, f.fullPath, f.fileSize, f.createdAt
+  FROM files_fts AS fts
+  JOIN files AS f ON fts.rowid = f.id
+  WHERE fts.content MATCH 'address'
+    AND f.isTextFile = 1;
+ */
