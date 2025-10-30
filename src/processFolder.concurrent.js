@@ -66,6 +66,7 @@ function flushBatch(db, insert, update) {
             item.fileFormat,
             item.fileSize,
             item.isTextFile ? 1 : 0, 
+            item.content, 
             item.hash,
             item.indexedAt,
             item.createdAt,
@@ -99,7 +100,7 @@ async function processFile(filePath, db, insert, update) {
   try {
     const stat = await fs.stat(filePath);
     //const hash = await hashFile(filePath);
-    const { hash, isTextFile } = await analyzeFile(filePath)
+    const { hash, isTextFile, content } = await analyzeFile(filePath)
     const fileName = path.basename(filePath);
     const fileFormat = path.extname(filePath).slice(1).toLowerCase();
     const fileSize = stat.size;
@@ -116,6 +117,7 @@ async function processFile(filePath, db, insert, update) {
       fileFormat,
       fileSize,
       isTextFile, 
+      content, 
       hash,
       indexedAt, 
       createdAt,
