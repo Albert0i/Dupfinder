@@ -65,7 +65,7 @@ async function getFormats() {
     const response = await fetch(`http://${HOST}:${PORT}/api/v1/files/formats`);
     const result = await response.json();
 
-    formats = [{ fileFormat: '*ALL*' }, ...result ]
+    formats = [{ fileFormat: '*ALL*', count: 0 }, ...result ]
   } catch (err) {
     console.error(err.message);
   }

@@ -75,7 +75,7 @@
                       class="px-4 py-2 border border-black rounded focus:outline-none focus:ring focus:border-blue-400 bg-white text-gray-700">
                 <% fileFormats.forEach(format => { %>
                   <option value="<%= format.fileFormat %>" <%= format.fileFormat === selectedFormat ? 'selected' : '' %>>
-                    <%= format.fileFormat %>
+                    <%= format.fileFormat %><%= format.count > 0 ? `  (${format.count})` : '' %>
                   </option>
                 <% }) %>
               </select>

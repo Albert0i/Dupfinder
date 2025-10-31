@@ -189,13 +189,14 @@ router.get('/files/search/:stext', async (req, res) => {
   const cond1 = stext === '*' ? '1 = 1' : `LOWER(fileName) LIKE '%${stext.trim().toLowerCase()}%'`
   // fileFormat 
   const cond2 = selectedFormat === '*ALL*' ? '' : ` AND fileFormat = '${selectedFormat}'`
-  // fileName search 
+    // fileName search 
   const query1 = `
     SELECT id, fileName, fullPath, fileSize, createdAt
     FROM files
     WHERE ${cond1} ${cond2}
     LIMIT ${process.env.MAX_LIMIT};
   `;
+  //console.log('query1 = ', query1)
 
   // full text search on file content
   const query2 = `
@@ -204,8 +205,11 @@ router.get('/files/search/:stext', async (req, res) => {
     JOIN files AS f ON fts.rowid = f.id
     WHERE fts.content MATCH '${stext.trim()}'
       AND f.isTextFile = 1
+      ${cond2}
     LIMIT ${process.env.MAX_LIMIT};
   `
+  //console.log('query2 = ', query2)
+
   try {
     const rows = db.prepare(textContent ? query2 : query1).all()
 
@@ -219,12 +223,16 @@ router.get('/files/search/:stext', async (req, res) => {
 // GET /api/v1/fileformats — returns all fileFormat in files
 router.get('/files/formats', async (req, res) => {  
   const query = `
-    SELECT distinct fileFormat
+    SELECT fileFormat, count(*) AS count
     FROM files
     WHERE fileFormat <> '' AND 
           CAST(CAST(fileFormat AS INTEGER) AS TEXT) <> fileFormat AND 
           LOWER(fileFormat) NOT LIKE '%tmp%' AND 
-          LOWER(fileFormat) NOT LIKE '%rfc%'  
+          LOWER(fileFormat) NOT LIKE '%rfc%' AND 
+          LOWER(fileFormat) NOT LIKE '%bak%' AND 
+          fileFormat NOT LIKE '____-__-__' AND
+          NOT (fileFormat GLOB '[0-9][0-9][0-9]')
+    GROUP BY fileFormat
     ORDER BY fileFormat;
   `;
   try {
