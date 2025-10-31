@@ -200,12 +200,14 @@ router.get('/files/search/:stext', async (req, res) => {
 
   // full text search on file content
   const query2 = `
-    SELECT f.id, f.fileName, f.fullPath, f.fileSize, f.createdAt
+    SELECT f.id, f.fileName, f.fullPath, f.fileSize, f.createdAt, 
+           bm25(files_fts) AS score
     FROM files_fts AS fts
     JOIN files AS f ON fts.rowid = f.id
     WHERE fts.content MATCH '${stext.trim()}'
       AND f.isTextFile = 1
       ${cond2}
+    ORDER BY bm25(files_fts)
     LIMIT ${process.env.MAX_LIMIT};
   `
   //console.log('query2 = ', query2)
@@ -216,7 +218,8 @@ router.get('/files/search/:stext', async (req, res) => {
     res.json( rows );
   } catch (err) {
     console.error('API error:', err);
-    res.status(500).json({ error: 'Failed to read database.' });
+    //res.status(500).json({ error: 'Failed to read database.' });
+    res.status(500).json({ error: 'Failed to read database.', message: err.message });
   }
 });
 

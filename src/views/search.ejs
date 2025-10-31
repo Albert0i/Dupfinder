@@ -47,7 +47,7 @@
 
     <!-- 📊 Main -->
     <main class="w-full">
-      <h1 class="text-xl font-semibold mb-6 text-black text-center">Search</h1>
+      <h1 class="text-xl font-semibold mb-4 text-black text-center">Search</h1>
 
       <div class="w-2/3 mx-auto">
         <form action="/search" method="POST" class="space-y-4">
@@ -92,7 +92,7 @@
                     class="form-checkbox h-4 w-4 text-blue-600"
                     <%= textContent ? 'checked' : '' %>
               >
-              <span>Text Content</span>
+              <span class="font-normal">Text Content</span>
             </label>
 
             <!-- Info Icon -->
@@ -131,9 +131,9 @@
     </main>
 
     <!-- 📁 Output -->
-    <section class="w-full max-w-6xl mt-10 p-6 bg-white shadow rounded">
+    <section class="w-full max-w-6xl mt-2 p-6 bg-white shadow rounded">
       <% if (results && results.length > 0) { %>
-        <div class="mt-6">
+        <div class="">
           <h2 class="text-lg font-medium mb-4 text-center">Results (<%= results.length %>)</h2>
           <!-- <ol class="space-y-4 list-decimal list-inside">
             <% results.forEach(file => { %>
@@ -154,12 +154,20 @@
 
           <ol class="space-y-4 list-decimal list-inside">
             <% results.forEach(file => { %>
-              <li class="border p-4 rounded bg-gray-100 text-sm text-gray-800">
+              <li class="border p-4 rounded bg-gray-100 text-md text-gray-800">
                 <div class="flex justify-between items-center">
 
                   <!-- 📄 File Info -->
                   <div class="space-y-1">
-                    <div><strong>Filename:</strong> <%= file.fileName %></div>
+                    <% if ('score' in file) { %>
+                      <div>
+                        <strong>Score:</strong> <%= file.score %>
+                      </div>
+                    <% } %>
+
+                    <div>
+                      <strong>Filename:</strong> <%= file.fileName %>
+                    </div>
                     <div>
                       <strong>Full Path:</strong>
                       <span class="cursor-pointer text-blue-600 hover:underline"
@@ -167,8 +175,12 @@
                         <%= file.fullPath %>
                       </span>
                     </div>
-                    <div><strong>Size:</strong> <%= formatBytes(file.fileSize) %> bytes</div>
-                    <div><strong>Created At:</strong> <%= new Date(file.createdAt).toLocaleString() %></div>
+                    <div>
+                      <strong>Size:</strong> <%= formatBytes(file.fileSize) %> bytes
+                    </div>
+                    <div>
+                      <strong>Created At:</strong> <%= new Date(file.createdAt).toLocaleString() %>
+                    </div>
                   </div>
           
                   <!-- 👁️ View Button -->                  
@@ -176,15 +188,20 @@
                         class="ml-4 w-28 h-8 flex items-center justify-center bg-cyan-600 text-white text-sm font-semibold rounded hover:bg-cyan-700 transition text-center whitespace-nowrap shrink-0">
                       View Text
                     </a>                    
-                  
+
                 </div>
               </li>
             <% }) %>
           </ol>
 
         </div>
-      <% } else if (results) { %>
-        <p class="mt-6 text-sm text-red-500 text-center">No matching files found.</p>
+      <% } else if (results.length === 0) { %>
+        <p class="mt-4 text-md text-red-500 text-center font-bold">No matching files found.</p>
+      <% } else { %>  
+        <p class="mt-4 text-md text-red-500 text-center font-bold">
+          <%= results.error %>
+          <br />
+          <%= results.message %></p>
       <% } %>
     </section>
 

@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
     fileFormats, 
     selectedFormat: '*ALL*', 
     textContent : null, 
-    results: null, 
+    results: [], 
     error: null 
   });
 });
@@ -36,18 +36,21 @@ router.post('/', async (req, res) => {
   try {
     const response = await fetch(`http://${HOST}:${PORT}/api/v1/files/search/${encodeURIComponent(stext.trim())}?format=${selectedFormat}&content=${textContent}`);
     const results = await response.json();
-
-    res.render('search', {
+    
+    res.status(response.status).render('search', {
       stext, 
       fileFormats: await getFormats(),
       selectedFormat, 
       textContent,
       results,
-      error: results.length === 0 ? 'No matching files found.' : null
+      //error: results.length === 0 ? 'No matching files found.' : null
+      error: Array.isArray(results) && results.length === 0 ? 
+        'No matching files found.' : 
+        results.toString()
     });
   } catch (err) {
     console.error('Search error:', err.message);
-    res.render('search', {
+    res.status(response.status).render('search', {
       stext, 
       fileFormats: await getFormats(),
       selectedFormat, 
