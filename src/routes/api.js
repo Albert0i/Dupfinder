@@ -233,8 +233,8 @@ router.get('/files/formats', async (req, res) => {
           LOWER(fileFormat) NOT LIKE '%tmp%' AND 
           LOWER(fileFormat) NOT LIKE '%rfc%' AND 
           LOWER(fileFormat) NOT LIKE '%bak%' AND 
-          fileFormat NOT LIKE '____-__-__' AND
-          NOT (fileFormat GLOB '[0-9][0-9][0-9]')
+          fileFormat NOT LIKE '%-%' AND 
+          NOT (fileFormat GLOB '[0-9]*')
     GROUP BY fileFormat
     ORDER BY fileFormat;
   `;
