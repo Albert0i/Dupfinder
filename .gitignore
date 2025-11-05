@@ -17,3 +17,5 @@ node_modules
 /data/
 
 /src/generated/prisma
+
+tailwindcss.exe
