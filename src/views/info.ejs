@@ -5,22 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>dupFinder Info</title>
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <script src="/assets/tailwind.js"></script>  
+  <!-- <script src="/assets/tailwind.js"></script>   -->
+  <link rel="stylesheet" href="/styles/build.css">
+
   <% function formatBytes(bytes) {
-    if (bytes === 0 || bytes == null) return '0 B';
-    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    const value = bytes / Math.pow(1024, i);
-    return `${value.toFixed(2)} ${units[i]}`;
-  } 
-  
-  function formatTime(seconds) {
-    const hrs = Math.floor(seconds / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
-    const secs = (seconds % 60).toFixed(2);
-  
-    return `${hrs}h : ${mins}m : ${secs}s`;
-  }  
+      if (bytes === 0 || bytes == null) return '0 B';
+      const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(1024));
+      const value = bytes / Math.pow(1024, i);
+      return `${value.toFixed(2)} ${units[i]}`;
+    } 
+    
+    function formatTime(seconds) {
+      const hrs = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
+      const secs = (seconds % 60).toFixed(2);
+    
+      return `${hrs}h : ${mins}m : ${secs}s`;
+    }  
   %>
 </head>
 <body class="bg-gray-100 text-gray-900 flex items-center justify-center">

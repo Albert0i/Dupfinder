@@ -26,6 +26,16 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', dashboardRouter);
+
+// Define a route for the root URL ("/")
+/* app.get("/", (req, res) => {
+  // Render the 'index' view (index.ejs) and pass in some data
+  res.render("index", {
+      title: "Tracker App",
+      message: "Welcome to your Tailwind-powered tracker!",
+  });
+}); */
+
 app.use('/duplicates', duplicatesRouter);
 app.use('/view', viewRouter);
 app.use('/info', infoRouter);

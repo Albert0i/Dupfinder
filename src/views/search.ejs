@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>dupFinder Search</title>
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <script src="/assets/tailwind.js"></script>  
+  <!-- <script src="/assets/tailwind.js"></script>   -->
+  <link rel="stylesheet" href="/styles/build.css">
+
   <script type="text/javascript">
     function copyToClipboard(text) {
       navigator.clipboard.writeText(text).then(() => {
@@ -15,8 +17,8 @@
         alert(`'${text}' clipboard copy failed:`, err);
       });
     }
-    </script>
-    <% function formatBytes(bytes) {
+  </script>
+  <% function formatBytes(bytes) {
       if (bytes === 0 || bytes == null) return '0 B';
       const units = ['B', 'KB', 'MB', 'GB', 'TB'];
       const i = Math.floor(Math.log(bytes) / Math.log(1024));
@@ -31,7 +33,7 @@
     
       return `${hrs}h : ${mins}m : ${secs}s`;
     }  
-    %>
+  %>
 </head>
 <body class="bg-gray-100 text-gray-900 flex items-center justify-center">
 

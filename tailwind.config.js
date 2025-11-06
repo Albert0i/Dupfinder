@@ -1,7 +1,11 @@
-module.exports = {
-    content: ["./src/view/**/*.ejs"],
-    theme: {
-      extend: {},
-    },
-    plugins: [],
-  }
+export default {
+  content: [
+    "./src/public/views/**/*.html",
+    "./src/views/**/*.ejs",
+    "./src/public/scripts/**/*.{js,mjs}"
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
