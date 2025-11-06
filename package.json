@@ -11,7 +11,7 @@
     "start": "node --watch --env-file .env src/server.js",
     "dev": "concurrently \"npm:build:css\" \"npm:start\"",
     "prisma": "node --env-file .env --experimental-transform-types src/prisma-test1.js",
-    "build:css": "postcss ./src/public/styles/styles.css -o ./src/public/styles/build.css --watch"
+    "build:css": "postcss ./src/public/styles/styles.css -o ./src/public/styles/build.css --watch --verbose"
   },
   "keywords": [],
   "author": "",
